@@ -13,3 +13,5 @@ C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801
 C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801229\[OLC2]Proyecto1_201801229\obj\Debug\netcoreapp3.1\[OLC2]Proyecto1_201801229.dll
 C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801229\[OLC2]Proyecto1_201801229\obj\Debug\netcoreapp3.1\[OLC2]Proyecto1_201801229.pdb
 C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801229\[OLC2]Proyecto1_201801229\obj\Debug\netcoreapp3.1\[OLC2]Proyecto1_201801229.genruntimeconfig.cache
+C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801229\[OLC2]Proyecto1_201801229\bin\Debug\netcoreapp3.1\Irony.dll
+C:\Users\l4kz4\Documents\GitHub\-OLC2-Proyecto1_201801229\[OLC2]Proyecto1_201801229\[OLC2]Proyecto1_201801229\obj\Debug\netcoreapp3.1\[OLC2]Proyecto1_201801229.csproj.CopyComplete

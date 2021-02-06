@@ -17,5 +17,19 @@ namespace _OLC2_Proyecto1_201801229
             InitializeComponent();
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Cargar_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
