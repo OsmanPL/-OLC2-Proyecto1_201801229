@@ -77,6 +77,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_OBJECT = ToTerm("object");
             var TK_ARRAY = ToTerm("array");
             var TK_OF = ToTerm("of");
+            var TK_TO = ToTerm("to");
             var TK_IF = ToTerm("if");
             var TK_CONST = ToTerm("const");
             var TK_THEN = ToTerm("then");
@@ -111,6 +112,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_type = new NonTerminal("NT_tipo");
             NonTerminal NT_funcion = new NonTerminal("NT_funcion");
             NonTerminal NT_operacion = new NonTerminal("NT_operacion");
+            NonTerminal NT_asignacion = new NonTerminal("NT_asignacion");
 
             //Declaracion
             NonTerminal NT_tipo = new NonTerminal("NT_tipo");
@@ -123,6 +125,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Objeto
             NonTerminal NT_declaracionObjeto = new NonTerminal("NT_declaracionObjeto");
             NonTerminal NT_camposObjeto = new NonTerminal("NT_camposObjeto");
+            NonTerminal NT_campos = new NonTerminal("NT_campos");
 
             //Operaciones
             NonTerminal NT_operacionRelacional = new NonTerminal("NT_operacionRelacional");
@@ -146,7 +149,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Instruccion
             NT_instruccion.Rule = NT_program
                 | NT_type
-                | NT_funcion
+                | NT_asignacion
                 | NT_declaracion;
 
             //Program
@@ -158,12 +161,15 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_inicializarVariable;
 
             //Inicializar Variable
-            NT_inicializarVariable.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA;
+            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + TK_IGUAL+ NT_expresion+ TK_PYCOMA;
 
             //Lista de Variables
             NT_listaVariables.Rule = NT_listaVariables + TK_COMA + IDENTIFICADOR
                 | IDENTIFICADOR;
+
+            //Asignacion
+            NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
+                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA;
 
             //Tipo
             NT_tipo.Rule = TK_STRING
@@ -177,7 +183,14 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_type.Rule = TK_TYPE + NT_objeto;
 
             //Objeto 
-            NT_objeto.Rule = NT_declaracionObjeto + NT_declaracion + TK_END + TK_PYCOMA;
+            NT_objeto.Rule = NT_declaracionObjeto + NT_campos + TK_END + TK_PYCOMA;
+
+            //Campos
+            NT_campos.Rule = NT_campos + NT_camposObjeto
+                | NT_camposObjeto;
+
+            //Campos Objeto
+            NT_camposObjeto.Rule = TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA;
 
             //Declaracion Objeto
             NT_declaracionObjeto.Rule = IDENTIFICADOR + TK_IGUAL + TK_OBJECT + TK_PYCOMA;
@@ -186,6 +199,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_operacion.Rule = NT_operacion + TK_AND + NT_operacion
                 | NT_operacion + TK_OR + NT_operacion
                 | TK_NOT + NT_operacion
+                | TK_PARIZQ + NT_operacion + TK_PARDER
                 | NT_operacionRelacional;
 
             //Operacion Relacional
@@ -195,6 +209,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_expresion + TK_MEN + NT_expresion
                 | NT_expresion + TK_MAYIGUAL + NT_expresion
                 | NT_expresion + TK_MENIGUAL + NT_expresion
+                | TK_PARIZQ + NT_operacionRelacional + TK_PARDER
                 | NT_expresion;
 
             //Expresion
@@ -203,7 +218,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_expresion + TK_MUL + NT_expresion
                 | NT_expresion + TK_DIV + NT_expresion
                 | NT_expresion + TK_MOD + NT_expresion
-                | TK_PARIZQ + NT_operacion + TK_PARDER
+                | TK_RES + NT_expresion
+                | TK_PARIZQ + NT_expresion + TK_PARDER
                 | IDENTIFICADOR + TK_PARIZQ + TK_PARDER
                 | IDENTIFICADOR + TK_PARIZQ + NT_valores + TK_PARDER
                 | NT_valor;
@@ -219,6 +235,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | TK_TRUE
                 | TK_FALSE
                 | IDENTIFICADOR;
+
+            #endregion
+
+            #region Preferencias
+            this.Root = inicio;
             #endregion
         }
     }

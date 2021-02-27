@@ -118,6 +118,7 @@ namespace _OLC2_Proyecto1_201801229
             this.Ejecutar.TabIndex = 14;
             this.Ejecutar.Text = "Ejecutar";
             this.Ejecutar.UseVisualStyleBackColor = true;
+            this.Ejecutar.Click += new System.EventHandler(this.Ejecutar_Click);
             // 
             // Traducir
             // 
