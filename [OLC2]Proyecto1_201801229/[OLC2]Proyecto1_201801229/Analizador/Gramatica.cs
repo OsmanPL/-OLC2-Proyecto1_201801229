@@ -191,7 +191,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Asignacion
             NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA;
+                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
+                | IDENTIFICADOR + TK_CORIZQ+NT_expresion+TK_CORDER+TK_IGUALAR+NT_expresion+TK_PYCOMA;
 
             //Tipo
             NT_tipo.Rule = TK_STRING
