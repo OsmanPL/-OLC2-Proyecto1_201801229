@@ -30,13 +30,13 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             }
             else
             {
-                for (int i =0; i<arbol.ParserMessages.Count; i++)
+                for (int i = 0; i < arbol.ParserMessages.Count; i++)
                 {
-                    MessageBox.Show("Error: "+arbol.ParserMessages.ElementAt(i).Message +" "+arbol.ParserMessages.ElementAt(i).Location);
+                    MessageBox.Show("Error: " + arbol.ParserMessages.ElementAt(i).Message + " " + arbol.ParserMessages.ElementAt(i).Location);
                 }
             }
         }
-        
+
         private LinkedList<Instruccion> Instrucciones(ParseTreeNode nodoActual)
         {
             if (nodoActual.ChildNodes.Count == 2)
@@ -69,6 +69,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoDeclaracion(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_asignacion":
                     return metodoAsignacion(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_array":
+                    return metodoArray(nodoActual.ChildNodes.ElementAt(0)); ;
             }
             return null;
         }
@@ -77,7 +79,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         {
             if (nodoActual.ChildNodes.Count == 8)
             {
-                return new Programa(Instrucciones(nodoActual.ChildNodes.ElementAt(3)),Instrucciones(nodoActual.ChildNodes.ElementAt(5))) ;
+                return new Programa(Instrucciones(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(5)));
             }
             else
             {
@@ -95,11 +97,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
                     Object valorDafult = valorDefecto(tipo);
                     Operacion.Tipo_operacion tip = tipOp(tipo);
-                    return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult,tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)),true);
+                    return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), true);
                 }
                 else if (tipovar.Equals("const"))
                 {
-                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoExpresion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "",false);
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoExpresion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
                 }
             }
             else if (nodoActual.ChildNodes.Count == 1)
@@ -121,9 +123,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             {
                 Object val = valorDefecto(tipo);
                 Operacion.Tipo_operacion tip = tipOp(tipo);
-                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val,tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false) ;
+                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
             }
-           
+
         }
         private Operacion.Tipo_operacion tipOp(Simbolo.TipoDato tipo)
         {
@@ -320,9 +322,23 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             if (nodoActual.ChildNodes.Count == 4)
             {
                 return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(2)));
-            }else if (nodoActual.ChildNodes.Count == 6)
+            }
+            else if (nodoActual.ChildNodes.Count == 6)
             {
                 return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(4)), nodoActual.ChildNodes.ElementAt(2).ToString().Split(' ')[0]);
+            }else if (nodoActual.ChildNodes.Count == 7)
+            {
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), metodoExpresion(nodoActual.ChildNodes.ElementAt(2))) ;
+            }
+            return null;
+        }
+
+        private ArrayPascal metodoArray(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 13)
+            {
+                Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(11));
+                return new ArrayPascal(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), metodoExpresion(nodoActual.ChildNodes.ElementAt(8)), tipo, nodoActual.ChildNodes.ElementAt(11).ToString().Split(' ')[0]);
             }
             return null;
         }

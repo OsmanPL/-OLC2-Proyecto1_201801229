@@ -192,7 +192,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Asignacion
             NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
                 | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | IDENTIFICADOR + TK_CORIZQ+NT_expresion+TK_CORDER+TK_IGUALAR+NT_expresion+TK_PYCOMA;
+                | IDENTIFICADOR + TK_CORIZQ + NT_expresion + TK_CORDER + TK_IGUALAR + NT_expresion + TK_PYCOMA;
 
             //Tipo
             NT_tipo.Rule = TK_STRING
@@ -206,14 +206,14 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_type.Rule = TK_TYPE + NT_objeto;
 
             //Objeto 
-            NT_objeto.Rule = NT_declaracionObjeto + NT_campos + TK_END + TK_PYCOMA;
+            NT_objeto.Rule = NT_declaracionObjeto + TK_VAR+ NT_campos + TK_END + TK_PYCOMA;
 
             //Campos
             NT_campos.Rule = NT_campos + NT_camposObjeto
                 | NT_camposObjeto;
 
             //Campos Objeto
-            NT_camposObjeto.Rule = TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA;
+            NT_camposObjeto.Rule = NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA;
 
             //Declaracion Objeto
             NT_declaracionObjeto.Rule = IDENTIFICADOR + TK_IGUAL + TK_OBJECT + TK_PYCOMA;
