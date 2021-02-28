@@ -11,14 +11,16 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private Simbolo.TipoVarariable vc;
         private Object valor;
         private String type;
+        private bool lista;
 
-        public Declaracion(Object id, Simbolo.TipoDato tipo, Object valor,Simbolo.TipoVarariable vc, String type)
+        public Declaracion(Object id, Simbolo.TipoDato tipo, Object valor,Simbolo.TipoVarariable vc, String type, bool lista)
         {
             this.id = id;
             this.tipo = tipo;
             this.valor = valor;
             this.vc = vc;
             this.type = type;
+            this.lista = lista;
         }
 
         public Object ejecutar(TablaSimbolos ts)

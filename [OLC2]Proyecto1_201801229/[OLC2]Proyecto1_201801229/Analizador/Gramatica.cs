@@ -137,6 +137,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Expresion
             NonTerminal NT_valor = new NonTerminal("NT_valor");
             NonTerminal NT_valores = new NonTerminal("NT_valores");
+
+            //Arrays
+            NonTerminal NT_array = new NonTerminal("NT_array");
             #endregion
 
             #region Gramatica
@@ -163,16 +166,20 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Instruccion
             NT_instruccion.Rule = NT_type
-                | NT_declaracion;
+                | NT_declaracion
+                | NT_array;
 
-            
+            //Array
+            NT_array.Rule = TK_TYPE + IDENTIFICADOR + TK_IGUAL + TK_ARRAY + TK_CORIZQ + NT_expresion + TK_PUNTO + TK_PUNTO + NT_expresion + TK_CORDER + TK_OF + NT_tipo + TK_PYCOMA;
+
+
             //Declaracion
             NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA
                 | TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA
                 | NT_inicializarVariable;
 
             //Inicializar Variable
-            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo +NT_valorvacio + TK_PYCOMA;
+            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + NT_valorvacio + TK_PYCOMA;
 
             //Valor Vacio
             NT_valorvacio.Rule = TK_IGUAL + NT_expresion

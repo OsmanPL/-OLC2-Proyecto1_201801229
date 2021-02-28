@@ -21,10 +21,12 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             Parser parser = new Parser(lenguaje);
             ParseTree arbol = parser.Parse(codigo);
             ParseTreeNode raiz = arbol.Root;
-
+            Reporte reporte = new Reporte();
             if (raiz != null && arbol.ParserMessages.Count == 0)
             {
                 Instruccion AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
+
+                reporte.graficarArbol(raiz);
             }
             else
             {
@@ -92,11 +94,12 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 {
                     Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
                     Object valorDafult = valorDefecto(tipo);
-                    return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, valorDafult, Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)));
+                    Operacion.Tipo_operacion tip = tipOp(tipo);
+                    return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult,tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)),true);
                 }
                 else if (tipovar.Equals("const"))
                 {
-                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoExpresion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "");
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoExpresion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "",false);
                 }
             }
             else if (nodoActual.ChildNodes.Count == 1)
@@ -109,7 +112,50 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         private Declaracion iniciallizarVariable(ParseTreeNode nodoActual)
         {
             Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
-            return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3))) ;
+            bool t = valorvacio(nodoActual.ChildNodes.ElementAt(4));
+            if (t)
+            {
+                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, ini(nodoActual.ChildNodes.ElementAt(4)), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
+            }
+            else
+            {
+                Object val = valorDefecto(tipo);
+                Operacion.Tipo_operacion tip = tipOp(tipo);
+                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val,tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false) ;
+            }
+           
+        }
+        private Operacion.Tipo_operacion tipOp(Simbolo.TipoDato tipo)
+        {
+            switch (tipo)
+            {
+                case Simbolo.TipoDato.BOOLEAN:
+                    return Operacion.Tipo_operacion.BOOLEAN;
+                case Simbolo.TipoDato.INTEGER:
+                    return Operacion.Tipo_operacion.NUMERO;
+                case Simbolo.TipoDato.OBJECT:
+                    return Operacion.Tipo_operacion.OBJECT;
+                case Simbolo.TipoDato.REAL:
+                    return Operacion.Tipo_operacion.DECIMAL;
+                case Simbolo.TipoDato.STRING:
+                    return Operacion.Tipo_operacion.CADENA;
+                case Simbolo.TipoDato.IDENTIFICADOR:
+                    return Operacion.Tipo_operacion.IDENTIFICADOR;
+                default:
+                    return Operacion.Tipo_operacion.IDENTIFICADOR;
+            }
+        }
+        private Operacion ini(ParseTreeNode nodoActual)
+        {
+            return metodoExpresion(nodoActual.ChildNodes.ElementAt(1));
+        }
+        private bool valorvacio(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 2)
+            {
+                return true;
+            }
+            return false;
         }
 
         private Operacion metodoExpresion(ParseTreeNode nodoActual)
@@ -149,7 +195,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 Object valor = "";
 
                 operador = NT_valor(nodoActual.ChildNodes.ElementAt(0));
-                valor = NT_valor_valor(nodoActual.ChildNodes.ElementAt(0));
+                valor = NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ')[0];
 
                 Console.WriteLine(operador);
                 Console.WriteLine(valor);
