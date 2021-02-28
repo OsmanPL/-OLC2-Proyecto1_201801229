@@ -30,7 +30,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_DIV = ToTerm("/");
             var TK_MUL = ToTerm("*");
             var TK_MOD = ToTerm("%");
-                
+
             //Simbolos Agrupacion
             var TK_PARIZQ = ToTerm("(");
             var TK_PARDER = ToTerm(")");
@@ -91,7 +91,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_BREAK = ToTerm("break");
             var TK_CONTINUE = ToTerm("continue");
 
-            RegisterOperators(1, TK_IGUAL,TK_DIFERENTE,TK_MAY,TK_MAYIGUAL,TK_MEN,TK_MENIGUAL);
+            RegisterOperators(1, TK_IGUAL, TK_DIFERENTE, TK_MAY, TK_MAYIGUAL, TK_MEN, TK_MENIGUAL);
             RegisterOperators(2, TK_SUM, TK_RES, TK_OR);
             RegisterOperators(3, TK_MUL, TK_DIV, TK_MOD, TK_AND);
             RegisterOperators(4, TK_NOT);
@@ -105,6 +105,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal inicio = new NonTerminal("inicio");
             NonTerminal NT_instrucciones = new NonTerminal("NT_instrucciones");
             NonTerminal NT_instruccion = new NonTerminal("NT_instruccion");
+            NonTerminal NT_sentencia = new NonTerminal("NT_sentencia");
+            NonTerminal NT_sentencias = new NonTerminal("NT_sentencias");
 
             //Instrucciones
             NonTerminal NT_program = new NonTerminal("NT_program");
@@ -118,6 +120,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_tipo = new NonTerminal("NT_tipo");
             NonTerminal NT_listaVariables = new NonTerminal("NT_listaVariables");
             NonTerminal NT_inicializarVariable = new NonTerminal("NT_inicializarVariable");
+            NonTerminal NT_valorvacio = new NonTerminal("NT_valorvacio");
 
             //Type
             NonTerminal NT_objeto = new NonTerminal("NT_objeto");
@@ -138,30 +141,42 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             #region Gramatica
             //Inicio Gramatica
-            inicio.Rule = NT_instrucciones;
+            inicio.Rule = NT_program;
             inicio.ErrorRule = SyntaxError + TK_PYCOMA;
+
+            //Program
+            NT_program.Rule = TK_PROGRAM + IDENTIFICADOR + TK_PYCOMA + NT_instrucciones + TK_BEGIN + NT_sentencias + TK_END + TK_PUNTO;
+
 
             //Instrucciones
             NT_instrucciones.Rule = NT_instrucciones + NT_instruccion
                 | NT_instruccion
                 | Empty;
 
+            //Sentencias
+            NT_sentencias.Rule = NT_sentencias + NT_sentencia
+                | NT_sentencia
+                | Empty;
+
+            //Sentencia
+            NT_sentencia.Rule = NT_asignacion;
+
             //Instruccion
-            NT_instruccion.Rule = NT_program
-                | NT_type
-                | NT_asignacion
+            NT_instruccion.Rule = NT_type
                 | NT_declaracion;
 
-            //Program
-            NT_program.Rule = TK_PROGRAM + IDENTIFICADOR + TK_PYCOMA;
-
+            
             //Declaracion
             NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA
                 | TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA
                 | NT_inicializarVariable;
 
             //Inicializar Variable
-            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + TK_IGUAL+ NT_expresion+ TK_PYCOMA;
+            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo +NT_valorvacio + TK_PYCOMA;
+
+            //Valor Vacio
+            NT_valorvacio.Rule = TK_IGUAL + NT_expresion
+                | Empty;
 
             //Lista de Variables
             NT_listaVariables.Rule = NT_listaVariables + TK_COMA + IDENTIFICADOR
@@ -169,7 +184,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Asignacion
             NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA;
+                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA;
 
             //Tipo
             NT_tipo.Rule = TK_STRING

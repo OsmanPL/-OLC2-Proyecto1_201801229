@@ -8,6 +8,7 @@ using Irony.Parsing;
 using System.Text;
 using _OLC2_Proyecto1_201801229.Interfaces;
 using Irony.Ast;
+using System.Windows.Forms;
 
 namespace _OLC2_Proyecto1_201801229.Analizador
 {
@@ -23,10 +24,17 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             if (raiz != null && arbol.ParserMessages.Count == 0)
             {
-                LinkedList<Instruccion> AST = Instrucciones(raiz.ChildNodes.ElementAt(0));
+                Instruccion AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
+            }
+            else
+            {
+                for (int i =0; i<arbol.ParserMessages.Count; i++)
+                {
+                    MessageBox.Show("Error: "+arbol.ParserMessages.ElementAt(i).Message +" "+arbol.ParserMessages.ElementAt(i).Location);
+                }
             }
         }
-
+        
         private LinkedList<Instruccion> Instrucciones(ParseTreeNode nodoActual)
         {
             if (nodoActual.ChildNodes.Count == 2)
@@ -57,15 +65,17 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoProgram(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_declaracion":
                     return metodoDeclaracion(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_asignacion":
+                    return metodoAsignacion(nodoActual.ChildNodes.ElementAt(0));
             }
             return null;
         }
 
         private Instruccion metodoProgram(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 3)
+            if (nodoActual.ChildNodes.Count == 8)
             {
-                return new Programa();
+                return new Programa(Instrucciones(nodoActual.ChildNodes.ElementAt(3)),Instrucciones(nodoActual.ChildNodes.ElementAt(5))) ;
             }
             else
             {
@@ -257,6 +267,18 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         private Simbolo.TipoDato NT_tipo_VAR(ParseTreeNode nodoActual)
         {
             return buscarTipoDato(nodoActual.ChildNodes.ElementAt(0).ToString().ToLower().Split(' ')[0]);
+        }
+
+        private Asignacion metodoAsignacion(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 4)
+            {
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(2)));
+            }else if (nodoActual.ChildNodes.Count == 6)
+            {
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(4)), nodoActual.ChildNodes.ElementAt(2).ToString().Split(' ')[0]);
+            }
+            return null;
         }
     }
 }

@@ -6,9 +6,12 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
 {
     class Programa : Instruccion
     {
-        public Programa()
+        LinkedList<Instruccion> sentencias;
+        LinkedList<Instruccion> instrucciones;
+        public Programa(LinkedList<Instruccion> sentencias , LinkedList<Instruccion> instrucciones)
         {
-            
+            this.sentencias = sentencias;
+            this.instrucciones = instrucciones;
         }
 
 

@@ -39,6 +39,7 @@ namespace _OLC2_Proyecto1_201801229
             if (Traduccion.Text == "")
             {
                 ejecutar.analizar(Codigo.Text);
+      
             }
             else
             {
