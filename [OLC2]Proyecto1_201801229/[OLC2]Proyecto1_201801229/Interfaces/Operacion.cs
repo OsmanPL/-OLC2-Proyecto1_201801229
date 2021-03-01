@@ -39,6 +39,10 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private Operacion operadorDer;
         private Object valor;
 
+        public Operacion()
+        {
+
+        }
         public Operacion(Operacion operadorIzq, Operacion operadorDer, Tipo_operacion tipo)
         {
             this.tipo = tipo;

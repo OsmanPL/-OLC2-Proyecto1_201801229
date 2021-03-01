@@ -140,6 +140,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Arrays
             NonTerminal NT_array = new NonTerminal("NT_array");
+            NonTerminal NT_indice = new NonTerminal("NT_indice");
             #endregion
 
             #region Gramatica
@@ -166,12 +167,16 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Instruccion
             NT_instruccion.Rule = NT_type
-                | NT_declaracion
-                | NT_array;
+                | NT_declaracion;
 
             //Array
-            NT_array.Rule = TK_TYPE + IDENTIFICADOR + TK_IGUAL + TK_ARRAY + TK_CORIZQ + NT_expresion + TK_PUNTO + TK_PUNTO + NT_expresion + TK_CORDER + TK_OF + NT_tipo + TK_PYCOMA;
+            NT_array.Rule = TK_CORIZQ + NT_indice + TK_CORDER + TK_OF + NT_indice + TK_PYCOMA
+                | TK_OF + TK_CORIZQ + NT_indice + TK_CORDER + TK_OF + NT_indice + TK_PYCOMA;
 
+
+            //Indice
+            NT_indice.Rule = NT_tipo
+                | NT_expresion + TK_PUNTO + TK_PUNTO + NT_expresion;
 
             //Declaracion
             NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA
@@ -206,7 +211,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_type.Rule = TK_TYPE + NT_objeto;
 
             //Objeto 
-            NT_objeto.Rule = NT_declaracionObjeto + TK_VAR+ NT_campos + TK_END + TK_PYCOMA;
+            NT_objeto.Rule = NT_declaracionObjeto + TK_VAR + NT_campos + TK_END + TK_PYCOMA
+                | IDENTIFICADOR + TK_IGUAL + TK_ARRAY + NT_array;
 
             //Campos
             NT_campos.Rule = NT_campos + NT_camposObjeto

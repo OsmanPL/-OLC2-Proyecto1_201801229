@@ -69,8 +69,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoDeclaracion(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_asignacion":
                     return metodoAsignacion(nodoActual.ChildNodes.ElementAt(0));
-                case "NT_array":
-                    return metodoArray(nodoActual.ChildNodes.ElementAt(0)); ;
+                case "NT_type":
+                    return metodoTypeArray(nodoActual.ChildNodes.ElementAt(0)); ;
             }
             return null;
         }
@@ -326,21 +326,161 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             else if (nodoActual.ChildNodes.Count == 6)
             {
                 return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(4)), nodoActual.ChildNodes.ElementAt(2).ToString().Split(' ')[0]);
-            }else if (nodoActual.ChildNodes.Count == 7)
+            }
+            else if (nodoActual.ChildNodes.Count == 7)
             {
-                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), metodoExpresion(nodoActual.ChildNodes.ElementAt(2))) ;
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), metodoExpresion(nodoActual.ChildNodes.ElementAt(2)));
             }
             return null;
         }
-
-        private ArrayPascal metodoArray(ParseTreeNode nodoActual)
+        private Instruccion metodoTypeArray(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 13)
+            if (nodoActual.ChildNodes.Count == 2)
             {
-                Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(11));
-                return new ArrayPascal(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], metodoExpresion(nodoActual.ChildNodes.ElementAt(5)), metodoExpresion(nodoActual.ChildNodes.ElementAt(8)), tipo, nodoActual.ChildNodes.ElementAt(11).ToString().Split(' ')[0]);
+                return metodoSeparar(nodoActual.ChildNodes.ElementAt(1));
             }
             return null;
+        }
+        private Instruccion metodoSeparar(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 5)
+            {
+
+            }
+            else if (nodoActual.ChildNodes.Count == 4)
+            {
+                return metodoArray(nodoActual.ChildNodes.ElementAt(3), nodoActual.ChildNodes.ElementAt(0));
+            }
+            return null;
+        }
+        private ArrayPascal metodoArray(ParseTreeNode nodoActual, ParseTreeNode identificador)
+        {
+            if (nodoActual.ChildNodes.Count == 6)
+            {
+                Simbolo.TipoDato tipo1 = Simbolo.TipoDato.OBJECT;
+                String tipoS1 = "";
+                Operacion limizq1 = new Operacion();
+                Operacion limder1 = new Operacion();
+                Simbolo.TipoDato tipo2 = Simbolo.TipoDato.OBJECT;
+                String tipoS2 = "";
+                Operacion limizq2 = new Operacion();
+                Operacion limder2 = new Operacion();
+                bool indices = TipoIndice(nodoActual.ChildNodes.ElementAt(1));
+                if (indices)
+                {
+                    tipo1 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(1));
+                    tipoS1 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(1));
+                }
+                else
+                {
+                    limizq1 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(1));
+                    limder1 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(1));
+                }
+                bool ind = TipoIndice(nodoActual.ChildNodes.ElementAt(4));
+                if (ind)
+                {
+                    tipo2 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(4));
+                    tipoS2 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(4));
+                }
+                else
+                {
+                    limizq2 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(4));
+                    limder2 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(4));
+                }
+
+                if (indices && ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], tipo2, tipo1, tipoS1, ArrayPascal.TipoArray.T_T, tipoS2);
+                }
+                else if (indices && !ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq2, limder2, tipo1, tipoS1, ArrayPascal.TipoArray.T_Op);
+                }
+                else if (!indices && ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, tipo2, tipoS2, ArrayPascal.TipoArray.Op_T);
+                }
+                else
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, limizq2, limder2, ArrayPascal.TipoArray.Op_Op);
+                }
+            }
+            else if (nodoActual.ChildNodes.Count == 7)
+            {
+
+                Simbolo.TipoDato tipo1 = Simbolo.TipoDato.OBJECT;
+                String tipoS1 = "";
+                Operacion limizq1 = new Operacion();
+                Operacion limder1 = new Operacion();
+                Simbolo.TipoDato tipo2 = Simbolo.TipoDato.OBJECT;
+                String tipoS2 = "";
+                Operacion limizq2 = new Operacion();
+                Operacion limder2 = new Operacion();
+                bool indices = TipoIndice(nodoActual.ChildNodes.ElementAt(2));
+                if (indices)
+                {
+                    tipo1 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(2));
+                    tipoS1 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(2));
+                }
+                else
+                {
+                    limizq1 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(2));
+                    limder1 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(2));
+                }
+                bool ind = TipoIndice(nodoActual.ChildNodes.ElementAt(5));
+                if (ind)
+                {
+                    tipo2 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(5));
+                    tipoS2 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(5));
+                }
+                else
+                {
+                    limizq2 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(5));
+                    limder2 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(5));
+                }
+
+                if (indices && ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], tipo2, tipo1, tipoS1, ArrayPascal.TipoArray.T_T, tipoS2);
+                }
+                else if (indices && !ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq2, limder2, tipo1, tipoS1, ArrayPascal.TipoArray.T_Op);
+                }
+                else if (!indices && ind)
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, tipo2, tipoS2, ArrayPascal.TipoArray.Op_T);
+                }
+                else
+                {
+                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, limizq2, limder2, ArrayPascal.TipoArray.Op_Op);
+                }
+            }
+            return null;
+        }
+        private bool TipoIndice(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 1)
+            {
+                return true;
+            }
+            return false;
+        }
+        private Simbolo.TipoDato TipoDatoIndice(ParseTreeNode nodoActual)
+        {
+            return buscarTipoDato(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0].ToLower());
+        }
+        private String TipoDatoIndiceString(ParseTreeNode nodoActual)
+        {
+            return NT_tipo(nodoActual.ChildNodes.ElementAt(0));
+        }
+        private Operacion LimiteIzquierdo(ParseTreeNode nodoActual)
+        {
+            return metodoExpresion(nodoActual.ChildNodes.ElementAt(0));
+        }
+        private Operacion LimiteDerecho(ParseTreeNode nodoActual)
+        {
+            return metodoExpresion(nodoActual.ChildNodes.ElementAt(3));
         }
     }
 }
