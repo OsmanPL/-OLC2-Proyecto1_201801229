@@ -141,6 +141,18 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Arrays
             NonTerminal NT_array = new NonTerminal("NT_array");
             NonTerminal NT_indice = new NonTerminal("NT_indice");
+
+            //If
+            NonTerminal NT_if = new NonTerminal("NT_if");
+            NonTerminal NT_else = new NonTerminal("NT_else");
+            NonTerminal NT_elseif = new NonTerminal("NT_elseif");
+            NonTerminal NT_lista_else_if = new NonTerminal("NT_lista_else_if");
+
+            //Case
+            NonTerminal NT_sentenciaCase = new NonTerminal("NT_sentenciaCase");
+            NonTerminal NT_case = new NonTerminal("NT_case");
+            NonTerminal NT_listaCase = new NonTerminal("NT_listaCase");
+            NonTerminal NT_listaExpresionesCase = new NonTerminal("NT_listaExpresionesCase");
             #endregion
 
             #region Gramatica
@@ -163,7 +175,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | Empty;
 
             //Sentencia
-            NT_sentencia.Rule = NT_asignacion;
+            NT_sentencia.Rule = NT_asignacion
+                | NT_if
+                | NT_sentenciaCase;
 
             //Instruccion
             NT_instruccion.Rule = NT_type
@@ -176,10 +190,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Indice
             NT_indice.Rule = NT_tipo
-                | NT_expresion + TK_PUNTO + TK_PUNTO + NT_expresion;
+                | NT_operacion + TK_PUNTO + TK_PUNTO + NT_operacion;
 
             //Declaracion
-            NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_expresion + TK_PYCOMA
+            NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_operacion + TK_PYCOMA
                 | TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA
                 | NT_inicializarVariable;
 
@@ -187,7 +201,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + NT_valorvacio + TK_PYCOMA;
 
             //Valor Vacio
-            NT_valorvacio.Rule = TK_IGUAL + NT_expresion
+            NT_valorvacio.Rule = TK_IGUAL + NT_operacion
                 | Empty;
 
             //Lista de Variables
@@ -195,9 +209,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | IDENTIFICADOR;
 
             //Asignacion
-            NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_expresion + TK_PYCOMA
-                | IDENTIFICADOR + TK_CORIZQ + NT_expresion + TK_CORDER + TK_IGUALAR + NT_expresion + TK_PYCOMA;
+            NT_asignacion.Rule = IDENTIFICADOR + TK_IGUALAR + NT_operacion + TK_PYCOMA
+                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR + TK_IGUALAR + NT_operacion + TK_PYCOMA
+                | IDENTIFICADOR + TK_CORIZQ + NT_operacion + TK_CORDER + TK_IGUALAR + NT_operacion + TK_PYCOMA;
 
             //Tipo
             NT_tipo.Rule = TK_STRING
@@ -232,12 +246,12 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_operacionRelacional;
 
             //Operacion Relacional
-            NT_operacionRelacional.Rule = NT_expresion + TK_IGUAL + NT_expresion
-                | NT_expresion + TK_DIFERENTE + NT_expresion
-                | NT_expresion + TK_MAY + NT_expresion
-                | NT_expresion + TK_MEN + NT_expresion
-                | NT_expresion + TK_MAYIGUAL + NT_expresion
-                | NT_expresion + TK_MENIGUAL + NT_expresion
+            NT_operacionRelacional.Rule = NT_operacionRelacional + TK_IGUAL + NT_operacionRelacional
+                | NT_operacionRelacional + TK_DIFERENTE + NT_operacionRelacional
+                | NT_operacionRelacional + TK_MAY + NT_operacionRelacional
+                | NT_operacionRelacional + TK_MEN + NT_operacionRelacional
+                | NT_operacionRelacional + TK_MAYIGUAL + NT_operacionRelacional
+                | NT_operacionRelacional + TK_MENIGUAL + NT_operacionRelacional
                 | TK_PARIZQ + NT_operacionRelacional + TK_PARDER
                 | NT_expresion;
 
@@ -254,8 +268,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_valor;
 
             //Valores
-            NT_valores.Rule = NT_valores + TK_COMA + NT_expresion
-                | NT_expresion;
+            NT_valores.Rule = NT_valores + TK_COMA + NT_operacion
+                | NT_operacion;
 
             //Valor
             NT_valor.Rule = NUMERO
@@ -265,6 +279,37 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | TK_FALSE
                 | IDENTIFICADOR;
 
+            //If
+            NT_if.Rule = TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_else
+                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if
+                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if + NT_else;
+
+            //Lista Else If
+            NT_lista_else_if.Rule = NT_lista_else_if + NT_elseif
+                | NT_elseif
+                | Empty;
+
+            //Else If
+            NT_elseif.Rule = TK_ELSE + TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+
+            //Else
+            NT_else.Rule = TK_ELSE + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | Empty;
+
+            //Sentencia Case
+            NT_sentenciaCase.Rule = TK_CASE + TK_PARIZQ + NT_operacion + TK_PARDER + TK_OF + NT_listaCase + NT_else + TK_END + TK_PYCOMA;
+
+            //Lista Case
+            NT_listaCase.Rule = NT_listaCase + NT_case
+                | NT_case;
+
+            //Case
+            NT_case.Rule = NT_listaExpresionesCase + TK_DOSPUNTOS + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+
+            //Lista Expresiones Case
+            NT_listaExpresionesCase.Rule = NT_listaExpresionesCase + TK_COMA + NT_operacion
+                |NT_operacion;
             #endregion
 
             #region Preferencias
