@@ -9,6 +9,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         public enum Tipo_operacion
         {
             SUMA,
+            CONCAT,
             RESTA,
             MULTIPLICACION,
             DIVISION,
@@ -39,36 +40,38 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private Operacion operadorDer;
         private Object valor;
 
+        internal Tipo_operacion Tipo { get => tipo; set => tipo = value; }
+
         public Operacion()
         {
 
         }
         public Operacion(Operacion operadorIzq, Operacion operadorDer, Tipo_operacion tipo)
         {
-            this.tipo = tipo;
+            this.Tipo = tipo;
             this.operadorIzq = operadorIzq;
             this.operadorDer = operadorDer;
         }         
         public Operacion(Operacion operadorIzq, Tipo_operacion tipo)
         {
-            this.tipo = tipo;
+            this.Tipo = tipo;
             this.operadorIzq = operadorIzq;
         }
         public Operacion(String id, Tipo_operacion tipo)
         {
             this.id = id;
-            this.tipo = tipo;
+            this.Tipo = tipo;
         }
         public Operacion(String id, Object valor,Tipo_operacion tipo)
         {
             this.id = id;
             this.valor = valor;
-            this.tipo = tipo;
+            this.Tipo = tipo;
         }
         public Operacion(Object valor, Tipo_operacion tipo)
         {
             this.valor = valor;
-            this.tipo = tipo;
+            this.Tipo = tipo;
         }
 
 

@@ -107,6 +107,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_instruccion = new NonTerminal("NT_instruccion");
             NonTerminal NT_sentencia = new NonTerminal("NT_sentencia");
             NonTerminal NT_sentencias = new NonTerminal("NT_sentencias");
+            NonTerminal NT_vp = new NonTerminal("NT_vp");
 
             //Instrucciones
             NonTerminal NT_program = new NonTerminal("NT_program");
@@ -161,8 +162,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             inicio.ErrorRule = SyntaxError + TK_PYCOMA;
 
             //Program
-            NT_program.Rule = TK_PROGRAM + IDENTIFICADOR + TK_PYCOMA + NT_instrucciones + TK_BEGIN + NT_sentencias + TK_END + TK_PUNTO;
+            NT_program.Rule = NT_vp + NT_instrucciones + TK_BEGIN + NT_sentencias + TK_END + TK_PUNTO;
 
+            //VP
+            NT_vp.Rule = TK_PROGRAM + IDENTIFICADOR + TK_PYCOMA
+                | Empty;
 
             //Instrucciones
             NT_instrucciones.Rule = NT_instrucciones + NT_instruccion

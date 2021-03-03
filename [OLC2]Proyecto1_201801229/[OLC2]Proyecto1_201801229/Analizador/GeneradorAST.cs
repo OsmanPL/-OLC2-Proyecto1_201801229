@@ -226,7 +226,16 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 switch (operador)
                 {
                     case "+":
-                        return new Operacion(metodoExpresion(nodoActual.ChildNodes.ElementAt(0)), metodoExpresion(nodoActual.ChildNodes.ElementAt(2)), Operacion.Tipo_operacion.SUMA);
+                        Operacion opizq = metodoExpresion(nodoActual.ChildNodes.ElementAt(0));
+                        Operacion opder = metodoExpresion(nodoActual.ChildNodes.ElementAt(2));
+                        if ((opizq.Tipo == Operacion.Tipo_operacion.CADENA || opizq.Tipo == Operacion.Tipo_operacion.CONCAT ) &&(opder.Tipo == Operacion.Tipo_operacion.CONCAT || opder.Tipo == Operacion.Tipo_operacion.CADENA))
+                        {
+                            return new Operacion(opizq, opder, Operacion.Tipo_operacion.CONCAT);
+                        }
+                        else
+                        {
+                            return new Operacion(opizq, opder, Operacion.Tipo_operacion.SUMA);
+                        }
                     case "-":
                         return new Operacion(metodoExpresion(nodoActual.ChildNodes.ElementAt(0)), metodoExpresion(nodoActual.ChildNodes.ElementAt(2)), Operacion.Tipo_operacion.RESTA);
                     case "/":
