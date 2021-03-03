@@ -154,6 +154,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_case = new NonTerminal("NT_case");
             NonTerminal NT_listaCase = new NonTerminal("NT_listaCase");
             NonTerminal NT_listaExpresionesCase = new NonTerminal("NT_listaExpresionesCase");
+
+            //While
+            NonTerminal NT_while = new NonTerminal("NT_while");
             #endregion
 
             #region Gramatica
@@ -181,7 +184,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Sentencia
             NT_sentencia.Rule = NT_asignacion
                 | NT_if
-                | NT_sentenciaCase;
+                | NT_sentenciaCase
+                | NT_while;
 
             //Instruccion
             NT_instruccion.Rule = NT_type
@@ -314,6 +318,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Lista Expresiones Case
             NT_listaExpresionesCase.Rule = NT_listaExpresionesCase + TK_COMA + NT_operacion
                 |NT_operacion;
+
+            //While
+            NT_while.Rule = TK_WHILE + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
             #endregion
 
             #region Preferencias

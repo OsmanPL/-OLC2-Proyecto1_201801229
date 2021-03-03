@@ -75,6 +75,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoIf(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_sentenciaCase":
                     return metodoSwitch(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_while":
+                    return metodoWhile(nodoActual.ChildNodes.ElementAt(0));
             }
             return null;
         }
@@ -638,6 +640,15 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             if (nodoActual.ChildNodes.Count == 6)
             {
                 return new InstruccionCase(valoresParametros(nodoActual.ChildNodes.ElementAt(0)), Instrucciones(nodoActual.ChildNodes.ElementAt(3)));
+            }
+            return null;
+        }
+
+        private Instruccion metodoWhile(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 7)
+            {
+                return new InstruccionWhile(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(4)));
             }
             return null;
         }
