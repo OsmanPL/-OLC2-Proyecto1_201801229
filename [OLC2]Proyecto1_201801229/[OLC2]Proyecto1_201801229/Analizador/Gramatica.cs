@@ -120,6 +120,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             //Declaracion
             NonTerminal NT_tipo = new NonTerminal("NT_tipo");
             NonTerminal NT_listaVariables = new NonTerminal("NT_listaVariables");
+            NonTerminal NT_listaVar = new NonTerminal("NT_listaVar");
             NonTerminal NT_inicializarVariable = new NonTerminal("NT_inicializarVariable");
             NonTerminal NT_valorvacio = new NonTerminal("NT_valorvacio");
 
@@ -157,6 +158,13 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //While
             NonTerminal NT_while = new NonTerminal("NT_while");
+
+            //For
+            NonTerminal NT_for = new NonTerminal("NT_for");
+            NonTerminal NT_asigfor = new NonTerminal("NT_asifor");
+
+            //Repeat
+            NonTerminal NT_repeat = new NonTerminal("NT_repeat");
             #endregion
 
             #region Gramatica
@@ -185,7 +193,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_sentencia.Rule = NT_asignacion
                 | NT_if
                 | NT_sentenciaCase
-                | NT_while;
+                | NT_while
+                | NT_for
+                | NT_repeat;
 
             //Instruccion
             NT_instruccion.Rule = NT_type
@@ -288,10 +298,14 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | IDENTIFICADOR;
 
             //If
-            NT_if.Rule = TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
-                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_else
-                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if
-                | TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if + NT_else;
+            NT_if.Rule = TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_else
+                | TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if
+                | TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA + NT_lista_else_if + NT_else
+                | TK_IF + NT_operacion + TK_THEN + NT_sentencia
+                | TK_IF + NT_operacion + TK_THEN + NT_sentencia + NT_else
+                | TK_IF + NT_operacion + TK_THEN + NT_sentencia + NT_lista_else_if
+                | TK_IF + NT_operacion + TK_THEN + NT_sentencia + NT_lista_else_if + NT_else;
 
             //Lista Else If
             NT_lista_else_if.Rule = NT_lista_else_if + NT_elseif
@@ -299,28 +313,42 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | Empty;
 
             //Else If
-            NT_elseif.Rule = TK_ELSE + TK_IF + TK_PARIZQ + NT_operacion + TK_PARDER + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+            NT_elseif.Rule = TK_ELSE + TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_ELSE + TK_IF + NT_operacion + TK_THEN + NT_sentencia;
 
             //Else
             NT_else.Rule = TK_ELSE + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_ELSE + NT_sentencia
                 | Empty;
 
             //Sentencia Case
-            NT_sentenciaCase.Rule = TK_CASE + TK_PARIZQ + NT_operacion + TK_PARDER + TK_OF + NT_listaCase + NT_else + TK_END + TK_PYCOMA;
+            NT_sentenciaCase.Rule = TK_CASE  + NT_operacion  + TK_OF + NT_listaCase + NT_else + TK_END + TK_PYCOMA;
 
             //Lista Case
             NT_listaCase.Rule = NT_listaCase + NT_case
                 | NT_case;
 
             //Case
-            NT_case.Rule = NT_listaExpresionesCase + TK_DOSPUNTOS + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+            NT_case.Rule = NT_listaExpresionesCase + TK_DOSPUNTOS + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | NT_listaExpresionesCase + TK_DOSPUNTOS + NT_sentencia;
 
             //Lista Expresiones Case
             NT_listaExpresionesCase.Rule = NT_listaExpresionesCase + TK_COMA + NT_operacion
-                |NT_operacion;
+                | NT_operacion;
 
             //While
-            NT_while.Rule = TK_WHILE + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+            NT_while.Rule = TK_WHILE + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_WHILE + NT_operacion + TK_DO + NT_sentencia;
+
+            //For
+            NT_for.Rule = TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
+                | TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + NT_sentencia;
+
+            //Asigncion For
+            NT_asigfor.Rule = IDENTIFICADOR + TK_IGUALAR + NT_operacion;
+
+            //Repat-Until
+            NT_repeat.Rule = TK_REPEAT + NT_sentencias + TK_UNTIL + NT_operacion + TK_PYCOMA;
             #endregion
 
             #region Preferencias

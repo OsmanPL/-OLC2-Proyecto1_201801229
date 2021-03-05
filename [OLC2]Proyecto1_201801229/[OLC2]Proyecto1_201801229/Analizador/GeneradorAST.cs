@@ -77,6 +77,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoSwitch(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_while":
                     return metodoWhile(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_for":
+                    return metodoFor(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_repeat":
+                    return metodoRepeat(nodoActual.ChildNodes.ElementAt(0));
             }
             return null;
         }
@@ -230,7 +234,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     case "+":
                         Operacion opizq = metodoExpresion(nodoActual.ChildNodes.ElementAt(0));
                         Operacion opder = metodoExpresion(nodoActual.ChildNodes.ElementAt(2));
-                        if ((opizq.Tipo == Operacion.Tipo_operacion.CADENA || opizq.Tipo == Operacion.Tipo_operacion.CONCAT ) &&(opder.Tipo == Operacion.Tipo_operacion.CONCAT || opder.Tipo == Operacion.Tipo_operacion.CADENA))
+                        if ((opizq.Tipo == Operacion.Tipo_operacion.CADENA || opizq.Tipo == Operacion.Tipo_operacion.CONCAT) && (opder.Tipo == Operacion.Tipo_operacion.CONCAT || opder.Tipo == Operacion.Tipo_operacion.CADENA))
                         {
                             return new Operacion(opizq, opder, Operacion.Tipo_operacion.CONCAT);
                         }
@@ -554,24 +558,49 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
         private InstruccionIf metodoIf(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 11)
+            if (nodoActual.ChildNodes.Count == 9)
             {
-                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), metodoListaElseIf(nodoActual.ChildNodes.ElementAt(9)), metodoElse(nodoActual.ChildNodes.ElementAt(10)));
+                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(4)), metodoListaElseIf(nodoActual.ChildNodes.ElementAt(7)), metodoElse(nodoActual.ChildNodes.ElementAt(8)));
             }
-            else if (nodoActual.ChildNodes.Count == 10)
+            else if (nodoActual.ChildNodes.Count == 8)
             {
                 String operador = nodoActual.ChildNodes.ElementAt(9).Term.Name.ToString().ToLower().Split(' ')[0];
                 switch (operador)
                 {
                     case "NT_else":
-                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), null, metodoElse(nodoActual.ChildNodes.ElementAt(9)));
+                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(4)), null, metodoElse(nodoActual.ChildNodes.ElementAt(7)));
                     case "NT_lista_else_if":
-                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), metodoListaElseIf(nodoActual.ChildNodes.ElementAt(9)), null);
+                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(4)), metodoListaElseIf(nodoActual.ChildNodes.ElementAt(7)), null);
                 }
             }
-            else if (nodoActual.ChildNodes.Count == 9)
+            else if (nodoActual.ChildNodes.Count == 7)
             {
-                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), null, null);
+                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(3)), null, null);
+            }
+            else if (nodoActual.ChildNodes.Count == 6)
+            {
+                LinkedList<Instruccion> sentenciasIf = new LinkedList<Instruccion>();
+                sentenciasIf.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(3)));
+                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), sentenciasIf, metodoListaElseIf(nodoActual.ChildNodes.ElementAt(4)), metodoElse(nodoActual.ChildNodes.ElementAt(5)));
+            }
+            else if (nodoActual.ChildNodes.Count == 5)
+            {
+                String operador = nodoActual.ChildNodes.ElementAt(6).Term.Name.ToString().ToLower().Split(' ')[0];
+                LinkedList<Instruccion> sentenciasIf = new LinkedList<Instruccion>();
+                sentenciasIf.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(3)));
+                switch (operador)
+                {
+                    case "NT_else":
+                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), sentenciasIf, null, metodoElse(nodoActual.ChildNodes.ElementAt(4)));
+                    case "NT_lista_else_if":
+                        return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), sentenciasIf, metodoListaElseIf(nodoActual.ChildNodes.ElementAt(4)), null);
+                }
+            }
+            else if (nodoActual.ChildNodes.Count == 4)
+            {
+                LinkedList<Instruccion> sentenciasIf = new LinkedList<Instruccion>();
+                sentenciasIf.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(3)));
+                return new InstruccionIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), sentenciasIf, null, null);
             }
             return null;
         }
@@ -595,9 +624,15 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
         private InstruccionElseIf metodoElseIf(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 10)
+            if (nodoActual.ChildNodes.Count == 8)
             {
-                return new InstruccionElseIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(7)));
+                return new InstruccionElseIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Instrucciones(nodoActual.ChildNodes.ElementAt(5)));
+            }
+            else if (nodoActual.ChildNodes.Count == 5)
+            {
+                LinkedList<Instruccion> sentenciasElseIf = new LinkedList<Instruccion>();
+                sentenciasElseIf.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(4)));
+                return new InstruccionElseIf(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), sentenciasElseIf);
             }
             return null;
         }
@@ -608,25 +643,32 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             {
                 return new InstruccionElse(Instrucciones(nodoActual.ChildNodes.ElementAt(2)));
             }
+            else if (nodoActual.ChildNodes.Count == 2)
+            {
+                LinkedList<Instruccion> sentenciasElse = new LinkedList<Instruccion>();
+                sentenciasElse.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(1)));
+                return new InstruccionElse(sentenciasElse);
+            }
             return null;
         }
         private InstruccionSwitch metodoSwitch(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 9)
+            if (nodoActual.ChildNodes.Count == 7)
             {
-                return new InstruccionSwitch(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)),metodoListaCase(nodoActual.ChildNodes.ElementAt(5)),metodoElse(nodoActual.ChildNodes.ElementAt(6)));
+                return new InstruccionSwitch(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), metodoListaCase(nodoActual.ChildNodes.ElementAt(3)), metodoElse(nodoActual.ChildNodes.ElementAt(4)));
             }
             return null;
         }
 
         private LinkedList<InstruccionCase> metodoListaCase(ParseTreeNode nodoActual)
         {
-            if(nodoActual.ChildNodes.Count == 2)
+            if (nodoActual.ChildNodes.Count == 2)
             {
                 LinkedList<InstruccionCase> listaCase = metodoListaCase(nodoActual.ChildNodes.ElementAt(0));
                 listaCase.AddLast(metodoCase(nodoActual.ChildNodes.ElementAt(1)));
                 return listaCase;
-            }else if (nodoActual.ChildNodes.Count == 1)
+            }
+            else if (nodoActual.ChildNodes.Count == 1)
             {
                 LinkedList<InstruccionCase> listaCase = new LinkedList<InstruccionCase>();
                 listaCase.AddLast(metodoCase(nodoActual.ChildNodes.ElementAt(0)));
@@ -644,11 +686,48 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             return null;
         }
 
-        private Instruccion metodoWhile(ParseTreeNode nodoActual)
+        private InstruccionWhile metodoWhile(ParseTreeNode nodoActual)
         {
             if (nodoActual.ChildNodes.Count == 7)
             {
                 return new InstruccionWhile(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(4)));
+            }
+            else if (nodoActual.ChildNodes.Count == 4)
+            {
+                LinkedList<Instruccion> senteciasWhile = new LinkedList<Instruccion>();
+                senteciasWhile.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(3)));
+                return new InstruccionWhile(metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), senteciasWhile);
+            }
+            return null;
+        }
+
+        private InstruccionFor metodoFor(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 9)
+            {
+                return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)),metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)));
+            }else if (nodoActual.ChildNodes.Count == 6)
+            {
+                LinkedList<Instruccion> sentenciasFor = new LinkedList<Instruccion>();
+                sentenciasFor.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(5)));
+                return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor);
+            }
+            return null;
+        }
+        private Asignacion metodoAsignacionFor(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 3)
+            {
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0],metodoOperacion(nodoActual.ChildNodes.ElementAt(2)));
+            }
+            return null;
+        }
+
+        private InstruccionRepeat metodoRepeat(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 5)
+            {
+                return new InstruccionRepeat(metodoOperacion(nodoActual.ChildNodes.ElementAt(3)),Instrucciones(nodoActual.ChildNodes.ElementAt(1)));
             }
             return null;
         }
