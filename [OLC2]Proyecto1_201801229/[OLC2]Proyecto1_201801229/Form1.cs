@@ -36,15 +36,12 @@ namespace _OLC2_Proyecto1_201801229
         private void Ejecutar_Click(object sender, EventArgs e)
         {
             GeneradorAST ejecutar = new GeneradorAST();
-            if (Traduccion.Text == "")
-            {
-                ejecutar.analizar(Codigo.Text);
-      
-            }
-            else
-            {
-                ejecutar.analizar(Traduccion.Text);
-            }
+            ejecutar.analizar(Codigo.Text);
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 }

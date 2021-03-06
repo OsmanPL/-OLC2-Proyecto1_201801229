@@ -113,6 +113,20 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 {
                     return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
                 }
+            }else if (nodoActual.ChildNodes.Count == 4)
+            {
+                String tipovar = nodoActual.ChildNodes.ElementAt(0).Term.Name.ToString().ToLower();
+                if (tipovar.Equals("NT_listaVariables"))
+                {
+                    Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
+                    Object valorDafult = valorDefecto(tipo);
+                    Operacion.Tipo_operacion tip = tipOp(tipo);
+                    return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), true);
+                }
+                else if (tipovar.Equals("IDENTIFICADOR"))
+                {
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
+                }
             }
             else if (nodoActual.ChildNodes.Count == 1)
             {
@@ -123,19 +137,36 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
         private Declaracion iniciallizarVariable(ParseTreeNode nodoActual)
         {
-            Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
-            bool t = valorvacio(nodoActual.ChildNodes.ElementAt(4));
-            if (t)
+            if (nodoActual.ChildNodes.Count == 6)
             {
-                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, ini(nodoActual.ChildNodes.ElementAt(4)), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
-            }
-            else
+                Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
+                bool t = valorvacio(nodoActual.ChildNodes.ElementAt(4));
+                if (t)
+                {
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, ini(nodoActual.ChildNodes.ElementAt(4)), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
+                }
+                else
+                {
+                    Object val = valorDefecto(tipo);
+                    Operacion.Tipo_operacion tip = tipOp(tipo);
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
+                }
+            }else if (nodoActual.ChildNodes.Count == 6)
             {
-                Object val = valorDefecto(tipo);
-                Operacion.Tipo_operacion tip = tipOp(tipo);
-                return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
+                Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(2));
+                bool t = valorvacio(nodoActual.ChildNodes.ElementAt(3));
+                if (t)
+                {
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], tipo, ini(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(2)), false);
+                }
+                else
+                {
+                    Object val = valorDefecto(tipo);
+                    Operacion.Tipo_operacion tip = tipOp(tipo);
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(2)), false);
+                }
             }
-
+            return null;
         }
         private Operacion.Tipo_operacion tipOp(Simbolo.TipoDato tipo)
         {
@@ -428,134 +459,14 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         }
         private ArrayPascal metodoArray(ParseTreeNode nodoActual, ParseTreeNode identificador)
         {
-            if (nodoActual.ChildNodes.Count == 6)
+            if (nodoActual.ChildNodes.Count == 9)
             {
-                Simbolo.TipoDato tipo1 = Simbolo.TipoDato.OBJECT;
-                String tipoS1 = "";
-                Operacion limizq1 = new Operacion();
-                Operacion limder1 = new Operacion();
-                Simbolo.TipoDato tipo2 = Simbolo.TipoDato.OBJECT;
-                String tipoS2 = "";
-                Operacion limizq2 = new Operacion();
-                Operacion limder2 = new Operacion();
-                bool indices = TipoIndice(nodoActual.ChildNodes.ElementAt(1));
-                if (indices)
-                {
-                    tipo1 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(1));
-                    tipoS1 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(1));
-                }
-                else
-                {
-                    limizq1 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(1));
-                    limder1 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(1));
-                }
-                bool ind = TipoIndice(nodoActual.ChildNodes.ElementAt(4));
-                if (ind)
-                {
-                    tipo2 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(4));
-                    tipoS2 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(4));
-                }
-                else
-                {
-                    limizq2 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(4));
-                    limder2 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(4));
-                }
-
-                if (indices && ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], tipo2, tipo1, tipoS1, ArrayPascal.TipoArray.T_T, tipoS2);
-                }
-                else if (indices && !ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq2, limder2, tipo1, tipoS1, ArrayPascal.TipoArray.T_Op);
-                }
-                else if (!indices && ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, tipo2, tipoS2, ArrayPascal.TipoArray.Op_T);
-                }
-                else
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, limizq2, limder2, ArrayPascal.TipoArray.Op_Op);
-                }
-            }
-            else if (nodoActual.ChildNodes.Count == 7)
-            {
-
-                Simbolo.TipoDato tipo1 = Simbolo.TipoDato.OBJECT;
-                String tipoS1 = "";
-                Operacion limizq1 = new Operacion();
-                Operacion limder1 = new Operacion();
-                Simbolo.TipoDato tipo2 = Simbolo.TipoDato.OBJECT;
-                String tipoS2 = "";
-                Operacion limizq2 = new Operacion();
-                Operacion limder2 = new Operacion();
-                bool indices = TipoIndice(nodoActual.ChildNodes.ElementAt(2));
-                if (indices)
-                {
-                    tipo1 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(2));
-                    tipoS1 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(2));
-                }
-                else
-                {
-                    limizq1 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(2));
-                    limder1 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(2));
-                }
-                bool ind = TipoIndice(nodoActual.ChildNodes.ElementAt(5));
-                if (ind)
-                {
-                    tipo2 = TipoDatoIndice(nodoActual.ChildNodes.ElementAt(5));
-                    tipoS2 = TipoDatoIndiceString(nodoActual.ChildNodes.ElementAt(5));
-                }
-                else
-                {
-                    limizq2 = LimiteIzquierdo(nodoActual.ChildNodes.ElementAt(5));
-                    limder2 = LimiteDerecho(nodoActual.ChildNodes.ElementAt(5));
-                }
-
-                if (indices && ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], tipo2, tipo1, tipoS1, ArrayPascal.TipoArray.T_T, tipoS2);
-                }
-                else if (indices && !ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq2, limder2, tipo1, tipoS1, ArrayPascal.TipoArray.T_Op);
-                }
-                else if (!indices && ind)
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, tipo2, tipoS2, ArrayPascal.TipoArray.Op_T);
-                }
-                else
-                {
-                    return new ArrayPascal(identificador.ToString().Split(' ')[0], limizq1, limder1, limizq2, limder2, ArrayPascal.TipoArray.Op_Op);
-                }
+                String tip = NT_tipo(nodoActual.ChildNodes.ElementAt(7));
+                Simbolo.TipoDato tipo = buscarTipoDato(tip);
+                return new ArrayPascal(identificador.ToString().Split(' ')[0],metodoOperacion(nodoActual.ChildNodes.ElementAt(1)),metodoOperacion(nodoActual.ChildNodes.ElementAt(4)),tipo,tip);
             }
             return null;
         }
-        private bool TipoIndice(ParseTreeNode nodoActual)
-        {
-            if (nodoActual.ChildNodes.Count == 1)
-            {
-                return true;
-            }
-            return false;
-        }
-        private Simbolo.TipoDato TipoDatoIndice(ParseTreeNode nodoActual)
-        {
-            return buscarTipoDato(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0].ToLower());
-        }
-        private String TipoDatoIndiceString(ParseTreeNode nodoActual)
-        {
-            return NT_tipo(nodoActual.ChildNodes.ElementAt(0));
-        }
-        private Operacion LimiteIzquierdo(ParseTreeNode nodoActual)
-        {
-            return metodoOperacion(nodoActual.ChildNodes.ElementAt(0));
-        }
-        private Operacion LimiteDerecho(ParseTreeNode nodoActual)
-        {
-            return metodoOperacion(nodoActual.ChildNodes.ElementAt(3));
-        }
-
         private InstruccionIf metodoIf(ParseTreeNode nodoActual)
         {
             if (nodoActual.ChildNodes.Count == 9)

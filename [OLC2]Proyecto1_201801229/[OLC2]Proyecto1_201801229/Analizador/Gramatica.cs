@@ -63,7 +63,6 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_INTEGER = ToTerm("integer");
             var TK_REAL = ToTerm("real");
             var TK_BOOLEAN = ToTerm("boolean");
-            var TK_VOID = ToTerm("void");
             var TK_STRING = ToTerm("string");
 
             //Palabras Reservadas
@@ -90,6 +89,12 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_FOR = ToTerm("for");
             var TK_BREAK = ToTerm("break");
             var TK_CONTINUE = ToTerm("continue");
+            var TK_FUNCTION = ToTerm("function");
+            var TK_PROCEDURE = ToTerm("procedure");
+            var TK_WRITE = ToTerm("write");
+            var TK_WRITELN = ToTerm("writeln");
+            var TK_EXIT = ToTerm("exit");
+            var TK_GRAFICAR_TS = ToTerm("graficar_ts");
 
             RegisterOperators(1, TK_IGUAL, TK_DIFERENTE, TK_MAY, TK_MAYIGUAL, TK_MEN, TK_MENIGUAL);
             RegisterOperators(2, TK_SUM, TK_RES, TK_OR);
@@ -114,13 +119,13 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_declaracion = new NonTerminal("NT_declaracion");
             NonTerminal NT_type = new NonTerminal("NT_tipo");
             NonTerminal NT_funcion = new NonTerminal("NT_funcion");
+            NonTerminal NT_procedimiento = new NonTerminal("NT_procedimiento");
             NonTerminal NT_operacion = new NonTerminal("NT_operacion");
             NonTerminal NT_asignacion = new NonTerminal("NT_asignacion");
 
             //Declaracion
             NonTerminal NT_tipo = new NonTerminal("NT_tipo");
             NonTerminal NT_listaVariables = new NonTerminal("NT_listaVariables");
-            NonTerminal NT_listaVar = new NonTerminal("NT_listaVar");
             NonTerminal NT_inicializarVariable = new NonTerminal("NT_inicializarVariable");
             NonTerminal NT_valorvacio = new NonTerminal("NT_valorvacio");
 
@@ -142,7 +147,6 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Arrays
             NonTerminal NT_array = new NonTerminal("NT_array");
-            NonTerminal NT_indice = new NonTerminal("NT_indice");
 
             //If
             NonTerminal NT_if = new NonTerminal("NT_if");
@@ -165,6 +169,22 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Repeat
             NonTerminal NT_repeat = new NonTerminal("NT_repeat");
+
+            //Funcion Procedimiento
+            NonTerminal NT_parametros = new NonTerminal("NT_parametros");
+            NonTerminal NT_parametro = new NonTerminal("NT_parametro");
+            NonTerminal NT_param = new NonTerminal("NT_param");
+            NonTerminal NT_instruccionesFP = new NonTerminal("NT_instruccionesFP");
+            NonTerminal NT_instruccionFP = new NonTerminal("NT_instruccionFP");
+
+            //Nativos
+            NonTerminal NT_write = new NonTerminal("NT_write");
+            NonTerminal NT_writeln = new NonTerminal("NT_writeln");
+            NonTerminal NT_exit = new NonTerminal("NT_exit");
+            NonTerminal NT_graficar_ts = new NonTerminal("NT_graficar_ts");
+            NonTerminal NT_imprimirDato = new NonTerminal("NT_imprimirDato");
+            NonTerminal NT_imprimir = new NonTerminal("NT_imprimir");
+            NonTerminal NT_opExit = new NonTerminal("NT_opExit");
             #endregion
 
             #region Gramatica
@@ -195,28 +215,31 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_sentenciaCase
                 | NT_while
                 | NT_for
-                | NT_repeat;
+                | NT_repeat
+                | NT_write
+                | NT_writeln
+                | NT_exit
+                | NT_graficar_ts;
 
             //Instruccion
             NT_instruccion.Rule = NT_type
-                | NT_declaracion;
+                | NT_declaracion
+                | NT_funcion
+                | NT_procedimiento;
 
             //Array
-            NT_array.Rule = TK_CORIZQ + NT_indice + TK_CORDER + TK_OF + NT_indice + TK_PYCOMA
-                | TK_OF + TK_CORIZQ + NT_indice + TK_CORDER + TK_OF + NT_indice + TK_PYCOMA;
-
-
-            //Indice
-            NT_indice.Rule = NT_tipo
-                | NT_operacion + TK_PUNTO + TK_PUNTO + NT_operacion;
+            NT_array.Rule = TK_CORIZQ + NT_operacion + TK_PUNTO + TK_PUNTO + NT_operacion + TK_CORDER + TK_OF + NT_tipo + TK_PYCOMA;
 
             //Declaracion
             NT_declaracion.Rule = TK_CONST + IDENTIFICADOR + TK_IGUAL + NT_operacion + TK_PYCOMA
                 | TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA
+                | IDENTIFICADOR + TK_IGUAL + NT_operacion + TK_PYCOMA
+                | NT_listaVariables + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA
                 | NT_inicializarVariable;
 
             //Inicializar Variable
-            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + NT_valorvacio + TK_PYCOMA;
+            NT_inicializarVariable.Rule = TK_VAR + IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + NT_valorvacio + TK_PYCOMA
+                | IDENTIFICADOR + TK_DOSPUNTOS + NT_tipo + NT_valorvacio + TK_PYCOMA;
 
             //Valor Vacio
             NT_valorvacio.Rule = TK_IGUAL + NT_operacion
@@ -322,7 +345,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | Empty;
 
             //Sentencia Case
-            NT_sentenciaCase.Rule = TK_CASE  + NT_operacion  + TK_OF + NT_listaCase + NT_else + TK_END + TK_PYCOMA;
+            NT_sentenciaCase.Rule = TK_CASE + NT_operacion + TK_OF + NT_listaCase + NT_else + TK_END + TK_PYCOMA;
 
             //Lista Case
             NT_listaCase.Rule = NT_listaCase + NT_case
@@ -349,6 +372,58 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Repat-Until
             NT_repeat.Rule = TK_REPEAT + NT_sentencias + TK_UNTIL + NT_operacion + TK_PYCOMA;
+
+            //Funcion
+            NT_funcion.Rule = TK_FUNCTION + IDENTIFICADOR + NT_param + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA + NT_instruccionesFP + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+
+            //Param
+            NT_param.Rule = TK_PARIZQ + NT_parametros + TK_PARDER
+                | Empty;
+
+            //Parametros
+            NT_parametros.Rule = NT_parametros + TK_PYCOMA + NT_parametro
+                | NT_parametro
+                | Empty;
+
+            //Parametro
+            NT_parametro.Rule = NT_listaVariables + TK_DOSPUNTOS + NT_tipo
+                | TK_VAR + NT_listaVariables + TK_DOSPUNTOS + NT_tipo;
+
+            //Intrucciones FP
+            NT_instruccionesFP.Rule = NT_instruccionesFP + NT_instruccionFP
+                | NT_instruccionFP
+                | Empty;
+
+            //Instruccion FP
+            NT_instruccionFP.Rule = NT_type
+                | NT_declaracion;
+
+            //Procedimiento
+            NT_procedimiento.Rule = TK_PROCEDURE + IDENTIFICADOR + NT_param + TK_PYCOMA + NT_instruccionesFP + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
+
+            //Write
+            NT_write.Rule = TK_WRITE + TK_PARIZQ + NT_imprimir + TK_PARDER + TK_PYCOMA;
+
+            //Writeln
+            NT_writeln.Rule = TK_WRITELN + TK_PARIZQ + NT_imprimir + TK_PARDER + TK_PYCOMA;
+
+            //Imprimir
+            NT_imprimir.Rule = NT_imprimir + TK_COMA + NT_imprimirDato
+                | NT_imprimirDato
+                | Empty;
+
+            //Imprimir Dato
+            NT_imprimirDato.Rule = NT_operacion;
+
+            //Exit
+            NT_exit.Rule = TK_EXIT + TK_PARIZQ + NT_opExit + TK_PARDER + TK_PYCOMA;
+
+            //OpExit
+            NT_opExit.Rule = NT_operacion
+                | Empty;
+
+            //Graficar TS
+            NT_graficar_ts.Rule = TK_GRAFICAR_TS + TK_PARIZQ + TK_PARDER + TK_PYCOMA;
             #endregion
 
             #region Preferencias
