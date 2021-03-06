@@ -185,6 +185,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_imprimirDato = new NonTerminal("NT_imprimirDato");
             NonTerminal NT_imprimir = new NonTerminal("NT_imprimir");
             NonTerminal NT_opExit = new NonTerminal("NT_opExit");
+
+            //Llamada
+            NonTerminal NT_llamadaFuncion = new NonTerminal("NT_llamadaFuncion");
+            NonTerminal NT_llamadaProdecimiento = new NonTerminal("NT_llamadaProcedimiento");
             #endregion
 
             #region Gramatica
@@ -211,6 +215,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Sentencia
             NT_sentencia.Rule = NT_asignacion
+                | NT_llamadaFuncion
+                | NT_llamadaProdecimiento
                 | NT_if
                 | NT_sentenciaCase
                 | NT_while
@@ -220,6 +226,12 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_writeln
                 | NT_exit
                 | NT_graficar_ts;
+
+            //Llamda Funcion
+            NT_llamadaFuncion.Rule = IDENTIFICADOR + TK_PARIZQ + NT_valores + TK_PARDER+TK_PYCOMA;
+
+            //LlamdaProcedimiento
+            NT_llamadaProdecimiento.Rule = IDENTIFICADOR + TK_PARIZQ + TK_PARDER+ TK_PYCOMA;
 
             //Instruccion
             NT_instruccion.Rule = NT_type
