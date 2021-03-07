@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,6 +82,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoFor(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_repeat":
                     return metodoRepeat(nodoActual.ChildNodes.ElementAt(0));
+                case "TK_BREAK":
+                    return new InstruccionBreak();
+                case "TK_CONTINUE":
+                    return new InstruccionContinue();
             }
             return null;
         }
@@ -449,6 +454,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         {
             if (nodoActual.ChildNodes.Count == 5)
             {
+                String id = NT_declaracionObjecto(nodoActual.ChildNodes.ElementAt(0));
+                Hashtable campos = camposType(nodoActual.ChildNodes.ElementAt(2));
+
+                return new InstruccionType(id,campos);
 
             }
             else if (nodoActual.ChildNodes.Count == 4)
@@ -457,6 +466,55 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             }
             return null;
         }
+
+        private String NT_declaracionObjecto(ParseTreeNode nodoActual)
+        {
+            return nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
+        }
+
+        private Hashtable camposType(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 2)
+            {
+                Hashtable campos = camposType(nodoActual.ChildNodes.ElementAt(0));
+                Hashtable camp = campoType(nodoActual.ChildNodes.ElementAt(1));
+                foreach (DictionaryEntry item in camp)
+                {
+                    campos.Add(item.Key, item.Value);
+                }
+                return campos;
+            }
+            else if (nodoActual.ChildNodes.Count == 1)
+            {
+                Hashtable campos = new Hashtable();
+                Hashtable camp = campoType(nodoActual.ChildNodes.ElementAt(0));
+                foreach (DictionaryEntry item in camp)
+                {
+                    campos.Add(item.Key,item.Value);
+                }
+                return campos;
+            }
+            return null;
+        }
+
+        private Hashtable campoType(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 4)
+            {
+                LinkedList<String> vars = listaVariables(nodoActual.ChildNodes.ElementAt(0));
+                Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
+                Object valor = valorDefecto(tipo);
+                Hashtable valores = new Hashtable();
+                Parametro parametro = new Parametro(tipo, valor);
+                foreach (String id in vars)
+                {
+                    valores.Add(id,parametro);
+                }
+                return valores;
+            }
+            return null;
+        }
+        
         private ArrayPascal metodoArray(ParseTreeNode nodoActual, ParseTreeNode identificador)
         {
             if (nodoActual.ChildNodes.Count == 9)
@@ -616,12 +674,29 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         {
             if (nodoActual.ChildNodes.Count == 9)
             {
-                return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)),metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)));
-            }else if (nodoActual.ChildNodes.Count == 6)
+                String tipo = nodoActual.ChildNodes.ElementAt(2).Term.Name.ToString().Split(' ')[0].ToLower();
+                if (tipo.Equals("to"))
+                {
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)),InstruccionFor.TipoFor.INCREMENTO);
+                }
+                else if (tipo.Equals("downto"))
+                {
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)),InstruccionFor.TipoFor.DECREMENTO);
+                }
+            }
+            else if (nodoActual.ChildNodes.Count == 6)
             {
                 LinkedList<Instruccion> sentenciasFor = new LinkedList<Instruccion>();
                 sentenciasFor.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(5)));
-                return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor);
+                String tipo = nodoActual.ChildNodes.ElementAt(2).Term.Name.ToString().Split(' ')[0].ToLower();
+                if (tipo.Equals("to"))
+                {
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor, InstruccionFor.TipoFor.INCREMENTO);
+                }
+                else if (tipo.Equals("downto"))
+                {
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor, InstruccionFor.TipoFor.DECREMENTO);
+                }
             }
             return null;
         }

@@ -77,6 +77,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             var TK_ARRAY = ToTerm("array");
             var TK_OF = ToTerm("of");
             var TK_TO = ToTerm("to");
+            var TK_DOWNTO = ToTerm("downto");
             var TK_IF = ToTerm("if");
             var TK_CONST = ToTerm("const");
             var TK_THEN = ToTerm("then");
@@ -169,6 +170,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 
             //Repeat
             NonTerminal NT_repeat = new NonTerminal("NT_repeat");
+
+            //Sentencias Ciclo
+            NonTerminal NT_sentenciasCiclo = new NonTerminal("NT_sentenciasCiclo");
+            NonTerminal NT_sentenciaCiclo = new NonTerminal("NT_sentenciaCiclo");
 
             //Funcion Procedimiento
             NonTerminal NT_parametros = new NonTerminal("NT_parametros");
@@ -372,18 +377,41 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_operacion;
 
             //While
-            NT_while.Rule = TK_WHILE + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
-                | TK_WHILE + NT_operacion + TK_DO + NT_sentencia;
+            NT_while.Rule = TK_WHILE + NT_operacion + TK_DO + TK_BEGIN + NT_sentenciasCiclo + TK_END + TK_PYCOMA
+                | TK_WHILE + NT_operacion + TK_DO + NT_sentenciaCiclo;
 
             //For
-            NT_for.Rule = TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA
-                | TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + NT_sentencia;
+            NT_for.Rule = TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + TK_BEGIN + NT_sentenciasCiclo + TK_END + TK_PYCOMA
+                | TK_FOR + NT_asigfor + TK_TO + NT_operacion + TK_DO + NT_sentenciaCiclo
+                | TK_FOR + NT_asigfor + TK_DOWNTO + NT_operacion + TK_DO + TK_BEGIN + NT_sentenciasCiclo + TK_END + TK_PYCOMA
+                | TK_FOR + NT_asigfor + TK_DOWNTO + NT_operacion + TK_DO + NT_sentenciaCiclo;
 
             //Asigncion For
             NT_asigfor.Rule = IDENTIFICADOR + TK_IGUALAR + NT_operacion;
 
             //Repat-Until
-            NT_repeat.Rule = TK_REPEAT + NT_sentencias + TK_UNTIL + NT_operacion + TK_PYCOMA;
+            NT_repeat.Rule = TK_REPEAT + NT_sentenciasCiclo + TK_UNTIL + NT_operacion + TK_PYCOMA;
+
+            //Sentencias
+            NT_sentenciasCiclo.Rule = NT_sentenciasCiclo + NT_sentenciaCiclo
+                | NT_sentenciaCiclo
+                | Empty;
+
+            //Sentencia
+            NT_sentenciaCiclo.Rule = NT_asignacion
+                | NT_llamadaFuncion
+                | NT_llamadaProdecimiento
+                | NT_if
+                | NT_sentenciaCase
+                | NT_while
+                | NT_for
+                | NT_repeat
+                | NT_write
+                | NT_writeln
+                | NT_exit
+                | NT_graficar_ts
+                | TK_CONTINUE
+                | TK_BREAK;
 
             //Funcion
             NT_funcion.Rule = TK_FUNCTION + IDENTIFICADOR + NT_param + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA + NT_instruccionesFP + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;
