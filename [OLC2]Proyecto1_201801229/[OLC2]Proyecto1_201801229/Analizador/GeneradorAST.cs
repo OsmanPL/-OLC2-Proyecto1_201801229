@@ -86,6 +86,18 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return new InstruccionBreak();
                 case "TK_CONTINUE":
                     return new InstruccionContinue();
+                case "NT_funcion":
+                    return metodoFuncion(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_procedimiento":
+                    return metodoOperacion(nodoActual.ChildNodes.ElementAt(0));
+                case "NT_write":
+                    return metodoImprimir(nodoActual.ChildNodes.ElementAt(0),InstruccionImprimir.TipoImprimir.WRITE);
+                case "NT_writeln":
+                    return metodoImprimir(nodoActual.ChildNodes.ElementAt(0), InstruccionImprimir.TipoImprimir.WRITELN);
+                case "NT_graficar_ts":
+                    return new GraficarTS();
+                case "NT_exit":
+                    return metodoExit(nodoActual.ChildNodes.ElementAt(0));
             }
             return null;
         }
@@ -118,7 +130,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 {
                     return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
                 }
-            }else if (nodoActual.ChildNodes.Count == 4)
+            }
+            else if (nodoActual.ChildNodes.Count == 4)
             {
                 String tipovar = nodoActual.ChildNodes.ElementAt(0).Term.Name.ToString().ToLower();
                 if (tipovar.Equals("NT_listaVariables"))
@@ -156,7 +169,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     Operacion.Tipo_operacion tip = tipOp(tipo);
                     return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
                 }
-            }else if (nodoActual.ChildNodes.Count == 6)
+            }
+            else if (nodoActual.ChildNodes.Count == 6)
             {
                 Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(2));
                 bool t = valorvacio(nodoActual.ChildNodes.ElementAt(3));
@@ -457,7 +471,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 String id = NT_declaracionObjecto(nodoActual.ChildNodes.ElementAt(0));
                 Hashtable campos = camposType(nodoActual.ChildNodes.ElementAt(2));
 
-                return new InstruccionType(id,campos);
+                return new InstruccionType(id, campos);
 
             }
             else if (nodoActual.ChildNodes.Count == 4)
@@ -490,7 +504,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 Hashtable camp = campoType(nodoActual.ChildNodes.ElementAt(0));
                 foreach (DictionaryEntry item in camp)
                 {
-                    campos.Add(item.Key,item.Value);
+                    campos.Add(item.Key, item.Value);
                 }
                 return campos;
             }
@@ -503,25 +517,26 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             {
                 LinkedList<String> vars = listaVariables(nodoActual.ChildNodes.ElementAt(0));
                 Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
-                Object valor = valorDefecto(tipo);
+                Object val = valorDefecto(tipo);
+                Operacion.Tipo_operacion tip = tipOp(tipo);
                 Hashtable valores = new Hashtable();
-                Parametro parametro = new Parametro(tipo, valor);
                 foreach (String id in vars)
                 {
-                    valores.Add(id,parametro);
+                    Parametro parametro = new Parametro(tipo, new Operacion(val, tip), NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
+                    valores.Add(id, parametro);
                 }
                 return valores;
             }
             return null;
         }
-        
+
         private ArrayPascal metodoArray(ParseTreeNode nodoActual, ParseTreeNode identificador)
         {
             if (nodoActual.ChildNodes.Count == 9)
             {
                 String tip = NT_tipo(nodoActual.ChildNodes.ElementAt(7));
                 Simbolo.TipoDato tipo = buscarTipoDato(tip);
-                return new ArrayPascal(identificador.ToString().Split(' ')[0],metodoOperacion(nodoActual.ChildNodes.ElementAt(1)),metodoOperacion(nodoActual.ChildNodes.ElementAt(4)),tipo,tip);
+                return new ArrayPascal(identificador.ToString().Split(' ')[0], metodoOperacion(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(4)), tipo, tip);
             }
             return null;
         }
@@ -677,11 +692,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 String tipo = nodoActual.ChildNodes.ElementAt(2).Term.Name.ToString().Split(' ')[0].ToLower();
                 if (tipo.Equals("to"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)),InstruccionFor.TipoFor.INCREMENTO);
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.INCREMENTO);
                 }
                 else if (tipo.Equals("downto"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)),InstruccionFor.TipoFor.DECREMENTO);
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.DECREMENTO);
                 }
             }
             else if (nodoActual.ChildNodes.Count == 6)
@@ -704,7 +719,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         {
             if (nodoActual.ChildNodes.Count == 3)
             {
-                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0],metodoOperacion(nodoActual.ChildNodes.ElementAt(2)));
+                return new Asignacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoOperacion(nodoActual.ChildNodes.ElementAt(2)));
             }
             return null;
         }
@@ -713,7 +728,131 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         {
             if (nodoActual.ChildNodes.Count == 5)
             {
-                return new InstruccionRepeat(metodoOperacion(nodoActual.ChildNodes.ElementAt(3)),Instrucciones(nodoActual.ChildNodes.ElementAt(1)));
+                return new InstruccionRepeat(metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(1)));
+            }
+            return null;
+        }
+
+        private Funcion metodoFuncion(ParseTreeNode nodoctual)
+        {
+            if (nodoctual.ChildNodes.Count == 11)
+            {
+                Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoctual.ChildNodes.ElementAt(4)));
+                Hashtable parametros = metodoParam(nodoctual.ChildNodes.ElementAt(2));
+                return new Funcion(nodoctual.ChildNodes.ElementAt(1).ToString().Split(' ')[0],tipo, parametros,Instrucciones(nodoctual.ChildNodes.ElementAt(6)),Instrucciones(nodoctual.ChildNodes.ElementAt(8)),NT_tipo(nodoctual.ChildNodes.ElementAt(4)));
+            }
+            return null;
+        }
+
+        private Procedimiento metodoProcedmiento(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 9)
+            {
+                Hashtable parametros = metodoParam(nodoActual.ChildNodes.ElementAt(2));
+                return new Procedimiento(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0],parametros,Instrucciones(nodoActual.ChildNodes.ElementAt(4)),Instrucciones(nodoActual.ChildNodes.ElementAt(6)));
+            }
+            return null;
+        }
+
+        private Hashtable metodoParam(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 3)
+            {
+                return metodoParametrosFuncionProcedmiento(nodoActual.ChildNodes.ElementAt(1));
+            }
+            return null;
+        }
+
+        private Hashtable metodoParametrosFuncionProcedmiento(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 3)
+            {
+                Hashtable campos = metodoParametrosFuncionProcedmiento(nodoActual.ChildNodes.ElementAt(0));
+                Hashtable camp = metodoParametroFP(nodoActual.ChildNodes.ElementAt(1));
+                foreach (DictionaryEntry item in camp)
+                {
+                    campos.Add(item.Key, item.Value);
+                }
+            }
+            else if (nodoActual.ChildNodes.Count == 1)
+            {
+                Hashtable campos = new Hashtable();
+                Hashtable camp = metodoParametroFP(nodoActual.ChildNodes.ElementAt(0));
+                foreach (DictionaryEntry item in camp)
+                {
+                    campos.Add(item.Key, item.Value);
+                }
+            }
+            return null;
+        }
+
+        private Hashtable metodoParametroFP(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 4)
+            {
+                LinkedList<String> vars = listaVariables(nodoActual.ChildNodes.ElementAt(1));
+                Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoActual.ChildNodes.ElementAt(3)));
+                Hashtable valores = new Hashtable();
+                foreach (String id in vars)
+                {
+                    ParametroFP parametro = new ParametroFP(tipo, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), ParametroFP.TipoValor.REFERENCIA);
+                    valores.Add(id, parametro);
+                }
+                return valores;
+            }
+            else if (nodoActual.ChildNodes.Count == 3)
+            {
+                LinkedList<String> vars = listaVariables(nodoActual.ChildNodes.ElementAt(0));
+                Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
+                Hashtable valores = new Hashtable();
+                foreach (String id in vars)
+                {
+                    ParametroFP parametro = new ParametroFP(tipo, NT_tipo(nodoActual.ChildNodes.ElementAt(2)), ParametroFP.TipoValor.VALOR);
+                    valores.Add(id, parametro);
+                }
+                return valores;
+            }
+            return null;
+        }
+        private InstruccionImprimir metodoImprimir(ParseTreeNode nodoActual, InstruccionImprimir.TipoImprimir tipo)
+        {
+            if (nodoActual.ChildNodes.Count == 5)
+            {
+                LinkedList<Operacion> operaciones = imprimirDato(nodoActual.ChildNodes.ElementAt(2));
+                return new InstruccionImprimir(tipo, operaciones); 
+            }
+            return null;
+        }
+
+        private LinkedList<Operacion> imprimirDato(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 3)
+            {
+                LinkedList<Operacion> operaciones = imprimirDato(nodoActual.ChildNodes.ElementAt(0));
+                operaciones.AddLast(metodoOperacion(nodoActual.ChildNodes.ElementAt(2)));
+                return operaciones;
+            }else if (nodoActual.ChildNodes.Count == 1)
+            {
+                LinkedList<Operacion> operaciones = new LinkedList<Operacion>();
+                operaciones.AddLast(metodoOperacion(nodoActual.ChildNodes.ElementAt(0)));
+                return operaciones;
+            }
+            return null;
+        }
+
+        private InstruccionExit metodoExit(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 5)
+            {
+                return new InstruccionExit(NT_opExit(nodoActual.ChildNodes.ElementAt(2)));
+            }
+            return null;
+        }
+        private Operacion NT_opExit(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 1)
+            {
+                return metodoOperacion(nodoActual.ChildNodes.ElementAt(0));
             }
             return null;
         }

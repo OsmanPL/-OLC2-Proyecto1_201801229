@@ -187,7 +187,6 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NonTerminal NT_writeln = new NonTerminal("NT_writeln");
             NonTerminal NT_exit = new NonTerminal("NT_exit");
             NonTerminal NT_graficar_ts = new NonTerminal("NT_graficar_ts");
-            NonTerminal NT_imprimirDato = new NonTerminal("NT_imprimirDato");
             NonTerminal NT_imprimir = new NonTerminal("NT_imprimir");
             NonTerminal NT_opExit = new NonTerminal("NT_opExit");
 
@@ -448,12 +447,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             NT_writeln.Rule = TK_WRITELN + TK_PARIZQ + NT_imprimir + TK_PARDER + TK_PYCOMA;
 
             //Imprimir
-            NT_imprimir.Rule = NT_imprimir + TK_COMA + NT_imprimirDato
-                | NT_imprimirDato
+            NT_imprimir.Rule = NT_imprimir + TK_COMA + NT_operacion
+                | NT_operacion
                 | Empty;
-
-            //Imprimir Dato
-            NT_imprimirDato.Rule = NT_operacion;
 
             //Exit
             NT_exit.Rule = TK_EXIT + TK_PARIZQ + NT_opExit + TK_PARDER + TK_PYCOMA;

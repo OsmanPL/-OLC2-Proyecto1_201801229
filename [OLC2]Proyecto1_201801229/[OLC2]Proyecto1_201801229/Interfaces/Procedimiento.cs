@@ -9,11 +9,15 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
     {
         String id;
         Hashtable parametros = new Hashtable();
+        LinkedList<Instruccion> instrucciones;
+        LinkedList<Instruccion> sentencias;
 
-        public Procedimiento(String id, Hashtable parametros)
+        public Procedimiento(String id, Hashtable parametros, LinkedList<Instruccion> instrucciones, LinkedList<Instruccion> sentencias)
         {
             this.parametros = parametros;
             this.id = id;
+            this.instrucciones = instrucciones;
+            this.sentencias = sentencias;
         }
 
         public Object ejecutar(TablaSimbolos ts)
