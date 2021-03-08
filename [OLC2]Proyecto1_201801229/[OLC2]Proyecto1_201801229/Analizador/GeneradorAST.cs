@@ -25,9 +25,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             Reporte reporte = new Reporte();
             if (raiz != null && arbol.ParserMessages.Count == 0)
             {
-                Instruccion AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
-
+                Programa AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
                 reporte.graficarArbol(raiz);
+                TablaSimbolos ts = new TablaSimbolos("Main");
+                AST.ejecutar(ts);
             }
             else
             {
@@ -102,11 +103,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             return null;
         }
 
-        private Instruccion metodoProgram(ParseTreeNode nodoActual)
+        private Programa metodoProgram(ParseTreeNode nodoActual)
         {
-            if (nodoActual.ChildNodes.Count == 8)
+            if (nodoActual.ChildNodes.Count == 6)
             {
-                return new Programa(Instrucciones(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(5)));
+                return new Programa(Instrucciones(nodoActual.ChildNodes.ElementAt(1)), Instrucciones(nodoActual.ChildNodes.ElementAt(3)));
             }
             else
             {
@@ -128,7 +129,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 }
                 else if (tipovar.Equals("const"))
                 {
-                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString(), Simbolo.TipoDato.OBJECT, metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
+                    return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], Simbolo.TipoDato.OBJECT, metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Simbolo.TipoVarariable.CONST, "", false);
                 }
             }
             else if (nodoActual.ChildNodes.Count == 4)
@@ -284,7 +285,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     case "+":
                         Operacion opizq = metodoExpresion(nodoActual.ChildNodes.ElementAt(0));
                         Operacion opder = metodoExpresion(nodoActual.ChildNodes.ElementAt(2));
-                        if ((opizq.Tipo == Operacion.Tipo_operacion.CADENA || opizq.Tipo == Operacion.Tipo_operacion.CONCAT) && (opder.Tipo == Operacion.Tipo_operacion.CONCAT || opder.Tipo == Operacion.Tipo_operacion.CADENA))
+                        if (opizq.Tipo == Operacion.Tipo_operacion.CADENA || opizq.Tipo == Operacion.Tipo_operacion.CONCAT)
                         {
                             return new Operacion(opizq, opder, Operacion.Tipo_operacion.CONCAT);
                         }
@@ -316,33 +317,69 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             }
             else
             {
-                string operador = "";
-                Object valor = "";
-
-                operador = NT_valor(nodoActual.ChildNodes.ElementAt(0));
-                valor = NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ')[0];
-
-                Console.WriteLine(operador);
-                Console.WriteLine(valor);
-                switch (operador.ToLower().Split(' ')[0])
+                if (pruebaValor(nodoActual.ChildNodes.ElementAt(0)))
                 {
-                    case "cadena":
-                        return new Operacion(valor, Operacion.Tipo_operacion.CADENA);
-                    case "numero":
-                        return new Operacion(valor, Operacion.Tipo_operacion.NUMERO);
-                    case "real":
-                        return new Operacion(valor, Operacion.Tipo_operacion.DECIMAL);
-                    case "true":
-                        return new Operacion(valor, Operacion.Tipo_operacion.BOOLEAN);
-                    case "false":
-                        return new Operacion(valor, Operacion.Tipo_operacion.BOOLEAN);
-                    case "object":
-                        return new Operacion(valor, Operacion.Tipo_operacion.OBJECT);
-                    default:
-                        return new Operacion(valor, Operacion.Tipo_operacion.IDENTIFICADOR);
-                }
+                    string operador = "";
+                    Object valor = "";
 
+                    operador = NT_valor(nodoActual.ChildNodes.ElementAt(0));
+                    valor = NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ')[0] ;
+                    if (NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ').Length > 2)
+                    {
+                        valor = "";
+                        for (int i = 0; i < NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ').Length; i++)
+                        {
+                            if (i != NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ').Length - 1)
+                            {
+                                valor += NT_valor_valor(nodoActual.ChildNodes.ElementAt(0)).ToString().Split(' ')[i]+" ";
+                            }
+                        }
+                    }
+
+                    Console.WriteLine(operador);
+                    Console.WriteLine(valor);
+                    switch (operador.ToLower().Split(' ')[0])
+                    {
+                        case "cadena":
+                            return new Operacion(valor, Operacion.Tipo_operacion.CADENA);
+                        case "numero":
+                            return new Operacion(valor, Operacion.Tipo_operacion.NUMERO);
+                        case "decimal":
+                            return new Operacion(valor, Operacion.Tipo_operacion.DECIMAL);
+                        case "true":
+                            return new Operacion(valor, Operacion.Tipo_operacion.BOOLEAN);
+                        case "false":
+                            return new Operacion(valor, Operacion.Tipo_operacion.BOOLEAN);
+                        case "object":
+                            return new Operacion(valor, Operacion.Tipo_operacion.OBJECT);
+                        default:
+                            return new Operacion(valor, Operacion.Tipo_operacion.IDENTIFICADOR);
+                    }
+                }
+                else
+                {
+                    return valorArrayType(nodoActual.ChildNodes.ElementAt(0));
+                }
             }
+        }
+        private Operacion valorArrayType(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 4)
+            {
+                return new Operacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], metodoOperacion(nodoActual.ChildNodes.ElementAt(2)), Operacion.Tipo_operacion.ARRAY) ;
+            }else if (nodoActual.ChildNodes.Count == 3)
+            {
+                return new Operacion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0],nodoActual.ChildNodes.ElementAt(2).ToString().Split(' ')[0],Operacion.Tipo_operacion.TYPE);
+            }
+            return null;
+        }
+        private bool pruebaValor(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 1)
+            {
+                return true;
+            }
+            return false;
         }
 
         private LinkedList<Operacion> valoresParametros(ParseTreeNode nodoActual)

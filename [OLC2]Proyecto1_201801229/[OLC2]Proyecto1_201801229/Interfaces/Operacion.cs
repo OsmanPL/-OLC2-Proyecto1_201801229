@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
@@ -31,7 +32,9 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             LLAMADAPROCEDIMIENTO,
             LLAMADAFUNCION,
             BOOLEAN,
-            OBJECT
+            OBJECT,
+            ARRAY,
+            TYPE
         }
 
         private Tipo_operacion tipo;
@@ -39,12 +42,27 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private Operacion operadorIzq;
         private Operacion operadorDer;
         private Object valor;
+        private LinkedList<Operacion> valores;
+        private String type;
 
         internal Tipo_operacion Tipo { get => tipo; set => tipo = value; }
 
         public Operacion()
         {
 
+        }
+        public Operacion(String id, String type, Tipo_operacion tipo)
+        {
+            this.id = id;
+            this.type = type;
+            this.tipo = tipo;
+        }
+
+        public Operacion(String id, Operacion operadorDer, Tipo_operacion tipo)
+        {
+            this.id = id;
+            this.operadorDer = operadorDer;
+            this.tipo = tipo;
         }
         public Operacion(Operacion operadorIzq, Operacion operadorDer, Tipo_operacion tipo)
         {
@@ -62,10 +80,10 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.id = id;
             this.Tipo = tipo;
         }
-        public Operacion(String id, Object valor,Tipo_operacion tipo)
+        public Operacion(String id, LinkedList<Operacion> valor,Tipo_operacion tipo)
         {
             this.id = id;
-            this.valor = valor;
+            this.valores = valor;
             this.Tipo = tipo;
         }
         public Operacion(Object valor, Tipo_operacion tipo)
@@ -76,6 +94,197 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
 
 
         public Object ejecutar(TablaSimbolos ts) {
+            Object valorIzquierdo;
+            Object valorDerecho;
+            switch (tipo)
+            {
+                //Operaciones Logicas
+                case Tipo_operacion.AND:
+                    return ((Boolean)operadorIzq.ejecutar(ts)) && ((Boolean)operadorDer.ejecutar(ts));
+                case Tipo_operacion.OR:
+                    return ((Boolean)operadorIzq.ejecutar(ts)) || ((Boolean)operadorDer.ejecutar(ts));
+                case Tipo_operacion.NOT:
+                    return !((Boolean)operadorIzq.ejecutar(ts));
+
+                //Operaciones Relacionales
+                case Tipo_operacion.MAYOR_IGUAL_QUE:
+                    return ((Double)operadorIzq.ejecutar(ts)) >= ((Double)operadorDer.ejecutar(ts));
+                case Tipo_operacion.MAYOR_QUE:
+                    return ((Double)operadorIzq.ejecutar(ts)) > ((Double)operadorDer.ejecutar(ts));
+                case Tipo_operacion.MENOR_IGUAL_QUE:
+                    return ((Double)operadorIzq.ejecutar(ts)) <= ((Double)operadorDer.ejecutar(ts));
+                case Tipo_operacion.MENOR_QUE:
+                    return ((Double)operadorIzq.ejecutar(ts)) < ((Double)operadorDer.ejecutar(ts));
+                case Tipo_operacion.IGUAL:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        return (operadorIzq.ejecutar(ts)).Equals((operadorDer.ejecutar(ts)));
+                    }
+                    return null;
+                case Tipo_operacion.DIFERENTE:
+                    return ((Double)operadorIzq.ejecutar(ts)) != ((Double)operadorDer.ejecutar(ts));
+
+                //Operaciones Aritmeticaas
+                case Tipo_operacion.SUMA:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if(valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo + (Double)valorDerecho;
+                        }
+                    }
+                    return null;
+                case Tipo_operacion.RESTA:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo - (Double)valorDerecho;
+                        }
+                    }
+                    return null;
+                case Tipo_operacion.MULTIPLICACION:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo * (Double)valorDerecho;
+                        }
+                    }
+                    return null;
+                case Tipo_operacion.DIVISION:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo / (Double)valorDerecho;
+                        }
+                    }
+                    return null;
+                case Tipo_operacion.MODULAR:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo % (Double)valorDerecho;
+                        }
+                    }
+                    return null;
+                case Tipo_operacion.NEGATIVO:
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    if (valorIzquierdo != null )
+                    {
+                        if (valorIzquierdo is Double )
+                        {
+                            return (Double)valorIzquierdo * -1;
+                        }
+                    }
+                    return null;
+                    
+
+                //Operacion Concatenar
+                case Tipo_operacion.CONCAT:
+                    return operadorIzq.ejecutar(ts).ToString() + operadorDer.ejecutar(ts).ToString();
+
+                //Valores
+                case Tipo_operacion.NUMERO:
+                    try
+                    {
+                        return Double.Parse(valor.ToString());
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo integer","Error");
+                        return null;
+                    }
+                case Tipo_operacion.DECIMAL:
+                    try
+                    {
+                        return Double.Parse(valor.ToString());
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.BOOLEAN:
+                    try
+                    {
+                        return Boolean.Parse(valor.ToString());
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo boolean", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.CADENA:
+                    try
+                    {
+                        return valor.ToString();
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.OBJECT:
+                    try
+                    {
+                        return valor;
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.IDENTIFICADOR:
+                    try
+                    {
+                        return ts.getValor(valor.ToString());
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.ARRAY:
+                    try
+                    {
+                        Object arr = ts.getValor(id);
+                        ArrayPascal arreglo = (ArrayPascal)arr;
+                        return arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString()));
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+                case Tipo_operacion.TYPE:
+                    try
+                    {
+                        Object arr = ts.getValor(id);
+                        InstruccionType arreglo = (InstruccionType)arr;
+                        return arreglo.buscarValor(type,ts);
+                    }
+                    catch (Exception er)
+                    {
+                        MessageBox.Show("No es tipo real", "Error");
+                        return null;
+                    }
+
+            }
             return null;
         }
     }

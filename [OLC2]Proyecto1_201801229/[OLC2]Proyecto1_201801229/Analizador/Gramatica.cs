@@ -15,8 +15,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             #region ER
             IdentifierTerminal IDENTIFICADOR = new IdentifierTerminal("ID");
             StringLiteral CADENA = new StringLiteral("cadena", "\'");
+            var DECIMAL = new RegexBasedTerminal("decimal", "[0-9]+'.'[0-9]+");
             var NUMERO = new NumberLiteral("numero");
-            var DECIMAL = new RegexBasedTerminal("real", "[0-9]+'.'[0-9]+");
 
             CommentTerminal comentarioLinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n");
             CommentTerminal comentarioBloque = new CommentTerminal("comentarioBloque", "{*", "*}");
@@ -334,7 +334,9 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | CADENA
                 | TK_TRUE
                 | TK_FALSE
-                | IDENTIFICADOR;
+                | IDENTIFICADOR
+                | IDENTIFICADOR + TK_PUNTO + IDENTIFICADOR
+                | IDENTIFICADOR + TK_CORIZQ + NT_operacion + TK_CORDER;
 
             //If
             NT_if.Rule = TK_IF + NT_operacion + TK_THEN + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA

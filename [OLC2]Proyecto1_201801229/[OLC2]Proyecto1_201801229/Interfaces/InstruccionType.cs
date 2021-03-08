@@ -10,6 +10,13 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         String id;
         Hashtable campos = new Hashtable();
 
+
+        public Object buscarValor(String campo , TablaSimbolos ts)
+        {
+            Parametro val = (Parametro)campos[campo];
+            Object valor = val.Valor.ejecutar(ts);
+            return valor;
+        }
         public InstruccionType(String id, Hashtable campos)
         {
             this.id = id;

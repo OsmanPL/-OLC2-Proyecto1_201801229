@@ -6,15 +6,20 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
 {
     class TablaSimbolos : LinkedList<Simbolo>
     {
-        public TablaSimbolos() : base()
-        { 
+        String entorno;
+
+        public string Entorno { get => entorno; set => entorno = value; }
+
+        public TablaSimbolos(String id) : base()
+        {
+            this.Entorno = id;
         }
 
         public Object getValor(String buscarSimbolo)
         {
             foreach (Simbolo simbolo in this)
             {
-                if (simbolo.Valor.Equals(buscarSimbolo))
+                if (simbolo.Id.ToLower().Equals(buscarSimbolo.ToLower()))
                 {
                     return simbolo.Valor;
                 }
@@ -23,11 +28,35 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             return "Desconocido";
         }
 
+        public Boolean existe(String buscarSimbolo)
+        {
+            foreach (Simbolo simbolo in this)
+            {
+                if (simbolo.Id.ToLower().Equals(buscarSimbolo.ToLower()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Simbolo getSimbolo(String buscarSimbolo)
+        {
+            foreach (Simbolo simbolo in this)
+            {
+                if (simbolo.Id.ToLower().Equals(buscarSimbolo.ToLower()))
+                {
+                    return simbolo;
+                }
+            }
+            return null;
+        }
+
         public void setValor(String buscarSimbolo, Object valor)
         {
             foreach (Simbolo simbolo in this)
             {
-                if (simbolo.Valor.Equals(buscarSimbolo))
+                if (simbolo.Id.ToLower().Equals(buscarSimbolo.ToLower()))
                 {
                     simbolo.Valor=valor;
                     return;
