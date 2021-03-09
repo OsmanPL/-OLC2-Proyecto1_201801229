@@ -15,27 +15,55 @@ namespace _OLC2_Proyecto1_201801229.Analizador
 {
     class GeneradorAST
     {
+        public static LinkedList<Funcion> funciones = new LinkedList<Funcion>();
+        public static LinkedList<Procedimiento> procedimientos = new LinkedList<Procedimiento>();
+        public static LinkedList<InstruccionType> type = new LinkedList<InstruccionType>();
+        public static LinkedList<Error> listaErrores = new LinkedList<Error>();
+        public static TablaSimbolos tablaCompleta = new TablaSimbolos("Completa");
+        ParseTreeNode raiz = null;
+        
+        public ParseTreeNode retornarRaiz()
+        {
+            return raiz;
+        }
         public void analizar(string codigo)
         {
             Gramatica gramatica = new Gramatica();
             LanguageData lenguaje = new LanguageData(gramatica);
             Parser parser = new Parser(lenguaje);
             ParseTree arbol = parser.Parse(codigo);
-            ParseTreeNode raiz = arbol.Root;
-            Reporte reporte = new Reporte();
+            raiz = arbol.Root;
+            funciones = new LinkedList<Funcion>();
+            procedimientos = new LinkedList<Procedimiento>();
+            type = new LinkedList<InstruccionType>();
+            tablaCompleta = new TablaSimbolos("Completa");
+            listaErrores = new LinkedList<Error>();
             if (raiz != null && arbol.ParserMessages.Count == 0)
             {
                 Programa AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
-                reporte.graficarArbol(raiz);
                 TablaSimbolos ts = new TablaSimbolos("Main");
                 AST.ejecutar(ts);
+                foreach (Simbolo sim in ts)
+                {
+                    tablaCompleta.AddLast(sim);
+                }
+                MessageBox.Show("Se ejecuto todo con exito","Correcto");
             }
             else
             {
                 for (int i = 0; i < arbol.ParserMessages.Count; i++)
                 {
-                    MessageBox.Show("Error: " + arbol.ParserMessages.ElementAt(i).Message + " " + arbol.ParserMessages.ElementAt(i).Location);
+                    if (arbol.ParserMessages.ElementAt(i).Message.Contains("Syntax"))
+                    {
+                        listaErrores.AddLast(new Error(arbol.ParserMessages.ElementAt(i).Message, Error.TipoError.SINTACTICO, arbol.ParserMessages.ElementAt(i).Location.Line, arbol.ParserMessages.ElementAt(i).Location.Column));
+                    }
+                    else
+                    {
+                        listaErrores.AddLast(new Error(arbol.ParserMessages.ElementAt(i).Message, Error.TipoError.LEXICO, arbol.ParserMessages.ElementAt(i).Location.Line, arbol.ParserMessages.ElementAt(i).Location.Column));
+                    }
                 }
+
+                MessageBox.Show("Existen errores", "Error");
             }
         }
 
@@ -83,14 +111,16 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoFor(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_repeat":
                     return metodoRepeat(nodoActual.ChildNodes.ElementAt(0));
-                case "TK_BREAK":
+                case "break":
                     return new InstruccionBreak();
-                case "TK_CONTINUE":
+                case "continue":
                     return new InstruccionContinue();
                 case "NT_funcion":
-                    return metodoFuncion(nodoActual.ChildNodes.ElementAt(0));
+                    metodoFuncion(nodoActual.ChildNodes.ElementAt(0));
+                    return null;
                 case "NT_procedimiento":
-                    return metodoOperacion(nodoActual.ChildNodes.ElementAt(0));
+                     metodoProcedmiento(nodoActual.ChildNodes.ElementAt(0));
+                    return null;
                 case "NT_write":
                     return metodoImprimir(nodoActual.ChildNodes.ElementAt(0),InstruccionImprimir.TipoImprimir.WRITE);
                 case "NT_writeln":
@@ -585,7 +615,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             }
             else if (nodoActual.ChildNodes.Count == 8)
             {
-                String operador = nodoActual.ChildNodes.ElementAt(9).Term.Name.ToString().ToLower().Split(' ')[0];
+                String operador = nodoActual.ChildNodes.ElementAt(7).Term.Name.ToString().Split(' ')[0];
                 switch (operador)
                 {
                     case "NT_else":
@@ -606,7 +636,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             }
             else if (nodoActual.ChildNodes.Count == 5)
             {
-                String operador = nodoActual.ChildNodes.ElementAt(6).Term.Name.ToString().ToLower().Split(' ')[0];
+                String operador = nodoActual.ChildNodes.ElementAt(4).Term.Name.ToString().Split(' ')[0];
                 LinkedList<Instruccion> sentenciasIf = new LinkedList<Instruccion>();
                 sentenciasIf.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(3)));
                 switch (operador)
@@ -703,6 +733,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             if (nodoActual.ChildNodes.Count == 6)
             {
                 return new InstruccionCase(valoresParametros(nodoActual.ChildNodes.ElementAt(0)), Instrucciones(nodoActual.ChildNodes.ElementAt(3)));
+            }else if (nodoActual.ChildNodes.Count == 3)
+            {
+                LinkedList<Instruccion> sentencia = new LinkedList<Instruccion>();
+                sentencia.AddLast(metodoInstruccion(nodoActual.ChildNodes.ElementAt(2))) ;
+                return new InstruccionCase(valoresParametros(nodoActual.ChildNodes.ElementAt(0)), sentencia);
             }
             return null;
         }
@@ -729,11 +764,18 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 String tipo = nodoActual.ChildNodes.ElementAt(2).Term.Name.ToString().Split(' ')[0].ToLower();
                 if (tipo.Equals("to"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.INCREMENTO);
+                    Operacion valu = new Operacion((Object)masgfor(nodoActual.ChildNodes.ElementAt(1)),Operacion.Tipo_operacion.IDENTIFICADOR);
+                    Operacion lim = metodoOperacion(nodoActual.ChildNodes.ElementAt(3));
+                    Operacion incremento = new Operacion(valu,lim,Operacion.Tipo_operacion.MAYOR_QUE);
+
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), incremento, Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.INCREMENTO, masgfor(nodoActual.ChildNodes.ElementAt(1)));
                 }
                 else if (tipo.Equals("downto"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.DECREMENTO);
+                    Operacion valu = new Operacion((Object)masgfor(nodoActual.ChildNodes.ElementAt(1)), Operacion.Tipo_operacion.IDENTIFICADOR);
+                    Operacion lim = metodoOperacion(nodoActual.ChildNodes.ElementAt(3));
+                    Operacion incremento = new Operacion(valu, lim, Operacion.Tipo_operacion.MENOR_QUE);
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), incremento, Instrucciones(nodoActual.ChildNodes.ElementAt(6)), InstruccionFor.TipoFor.DECREMENTO, masgfor(nodoActual.ChildNodes.ElementAt(1)));
                 }
             }
             else if (nodoActual.ChildNodes.Count == 6)
@@ -743,14 +785,28 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 String tipo = nodoActual.ChildNodes.ElementAt(2).Term.Name.ToString().Split(' ')[0].ToLower();
                 if (tipo.Equals("to"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor, InstruccionFor.TipoFor.INCREMENTO);
+                    Operacion valu = new Operacion((Object)masgfor(nodoActual.ChildNodes.ElementAt(1)), Operacion.Tipo_operacion.IDENTIFICADOR);
+                    Operacion lim = metodoOperacion(nodoActual.ChildNodes.ElementAt(3));
+                    Operacion incremento = new Operacion(valu, lim, Operacion.Tipo_operacion.MAYOR_QUE);
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), incremento, sentenciasFor, InstruccionFor.TipoFor.INCREMENTO, masgfor(nodoActual.ChildNodes.ElementAt(1)));
                 }
                 else if (tipo.Equals("downto"))
                 {
-                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)), metodoOperacion(nodoActual.ChildNodes.ElementAt(3)), sentenciasFor, InstruccionFor.TipoFor.DECREMENTO);
+                    Operacion valu = new Operacion((Object)masgfor(nodoActual.ChildNodes.ElementAt(1)), Operacion.Tipo_operacion.IDENTIFICADOR);
+                    Operacion lim = metodoOperacion(nodoActual.ChildNodes.ElementAt(3));
+                    Operacion incremento = new Operacion(valu, lim, Operacion.Tipo_operacion.MENOR_QUE);
+                    return new InstruccionFor(metodoAsignacionFor(nodoActual.ChildNodes.ElementAt(1)),incremento, sentenciasFor, InstruccionFor.TipoFor.DECREMENTO, masgfor(nodoActual.ChildNodes.ElementAt(1)));
                 }
             }
             return null;
+        }
+        private String masgfor(ParseTreeNode nodoActual)
+        {
+            if (nodoActual.ChildNodes.Count == 3)
+            {
+                return nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
+            }
+            return "";
         }
         private Asignacion metodoAsignacionFor(ParseTreeNode nodoActual)
         {

@@ -100,21 +100,83 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             {
                 //Operaciones Logicas
                 case Tipo_operacion.AND:
-                    return ((Boolean)operadorIzq.ejecutar(ts)) && ((Boolean)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Boolean && valorDerecho is Boolean)
+                        {
+                            return (Boolean)valorIzquierdo && (Boolean)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.OR:
-                    return ((Boolean)operadorIzq.ejecutar(ts)) || ((Boolean)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Boolean && valorDerecho is Boolean)
+                        {
+                            return (Boolean)valorIzquierdo || (Boolean)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.NOT:
-                    return !((Boolean)operadorIzq.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    if (valorIzquierdo != null)
+                    {
+                        if (valorIzquierdo is Boolean)
+                        {
+                            return !(Boolean)valorIzquierdo ;
+                        }
+                    }
+                    return null;
 
                 //Operaciones Relacionales
                 case Tipo_operacion.MAYOR_IGUAL_QUE:
-                    return ((Double)operadorIzq.ejecutar(ts)) >= ((Double)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo >= (Double)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.MAYOR_QUE:
-                    return ((Double)operadorIzq.ejecutar(ts)) > ((Double)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo > (Double)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.MENOR_IGUAL_QUE:
-                    return ((Double)operadorIzq.ejecutar(ts)) <= ((Double)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo <= (Double)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.MENOR_QUE:
-                    return ((Double)operadorIzq.ejecutar(ts)) < ((Double)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo < (Double)valorDerecho;
+                        }
+                    }
+                    return null;
                 case Tipo_operacion.IGUAL:
                     valorIzquierdo = operadorIzq.ejecutar(ts);
                     valorDerecho = operadorDer.ejecutar(ts);
@@ -124,7 +186,16 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     }
                     return null;
                 case Tipo_operacion.DIFERENTE:
-                    return ((Double)operadorIzq.ejecutar(ts)) != ((Double)operadorDer.ejecutar(ts));
+                    valorIzquierdo = operadorIzq.ejecutar(ts);
+                    valorDerecho = operadorDer.ejecutar(ts);
+                    if (valorIzquierdo != null && valorDerecho != null)
+                    {
+                        if (valorIzquierdo is Double && valorDerecho is Double)
+                        {
+                            return (Double)valorIzquierdo != (Double)valorDerecho;
+                        }
+                    }
+                    return null;
 
                 //Operaciones Aritmeticaas
                 case Tipo_operacion.SUMA:
@@ -252,7 +323,22 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 case Tipo_operacion.IDENTIFICADOR:
                     try
                     {
-                        return ts.getValor(valor.ToString());
+                        Simbolo sim = ts.getSimbolo(valor.ToString());
+                        switch (sim.Tipo)
+                        {
+                            case Simbolo.TipoDato.INTEGER:
+                                return Double.Parse(ts.getValor(valor.ToString()).ToString());
+                            case Simbolo.TipoDato.OBJECT:
+                                return ts.getValor(valor.ToString());
+                            case Simbolo.TipoDato.STRING:
+                                return ts.getValor(valor.ToString()).ToString();
+                            case Simbolo.TipoDato.REAL:
+                                return Double.Parse(ts.getValor(valor.ToString()).ToString());
+                            case Simbolo.TipoDato.BOOLEAN:
+                                return Boolean.Parse(ts.getValor(valor.ToString()).ToString());
+                            default:
+                                return null;
+                        }
                     }
                     catch (Exception er)
                     {

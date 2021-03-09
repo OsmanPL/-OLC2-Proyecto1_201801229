@@ -411,8 +411,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 | NT_writeln
                 | NT_exit
                 | NT_graficar_ts
-                | TK_CONTINUE
-                | TK_BREAK;
+                | TK_CONTINUE + TK_PYCOMA
+                | TK_BREAK + TK_PYCOMA;
 
             //Funcion
             NT_funcion.Rule = TK_FUNCTION + IDENTIFICADOR + NT_param + TK_DOSPUNTOS + NT_tipo + TK_PYCOMA + NT_instruccionesFP + TK_BEGIN + NT_sentencias + TK_END + TK_PYCOMA;

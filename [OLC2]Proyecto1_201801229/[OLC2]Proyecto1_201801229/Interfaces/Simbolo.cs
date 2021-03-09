@@ -11,29 +11,33 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private String id;
         private Object valor;
         private String type;
+        private String entorno;
 
-        public Simbolo(String id, TipoDato tipo, Object valor)
+        public Simbolo(String id, TipoDato tipo, Object valor, String entorno)
         {
             this.Tipo = tipo;
             this.Id = id;
             this.Valor = valor;
             this.TipoVar = TipoVarariable.VAR;
+            this.Entorno = entorno;
         }
 
-        public Simbolo(String id, Object valor)
+        public Simbolo(String id, Object valor, String entorno)
         {
             this.Id = id;
             this.Valor = valor;
             this.TipoVar = TipoVarariable.CONST;
+            this.Entorno = entorno;
         }
 
-        public Simbolo(String id, TipoDato tipo, Object valor, String type)
+        public Simbolo(String id, TipoDato tipo, Object valor, String type, String entorno)
         {
             this.Tipo = tipo;
             this.Id = id;
             this.Valor = valor;
             this.TipoVar = TipoVarariable.VAR;
-            this.type = type;
+            this.Type = type;
+            this.Entorno = entorno;
         }
 
 
@@ -42,6 +46,8 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         public Object Valor { get => valor; set => valor = value; }
         internal TipoDato Tipo { get => tipo; set => tipo = value; }
         internal TipoVarariable TipoVar { get => tipoVar; set => tipoVar = value; }
+        public string Type { get => type; set => type = value; }
+        public string Entorno { get => entorno; set => entorno = value; }
 
         public enum TipoDato
         {

@@ -14,6 +14,13 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
+            if (sentencias!=null)
+            {
+                foreach (Instruccion inst in sentencias)
+                {
+                    inst.ejecutar(ts);
+                }
+            }
             return null;
         }
     }

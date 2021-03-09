@@ -18,6 +18,29 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
+            Object valor = condicion.ejecutar(ts);
+            bool ejelse = true;
+            if (listaCase!=null)
+            {
+                foreach (InstruccionCase cas in listaCase)
+                {
+
+                    bool iguales = cas.Iguales(valor, ts);
+                    if (iguales)
+                    {
+                        ejelse = false;
+                        cas.ejecutar(ts);
+                        break;
+                    }
+                }
+            }
+            if (instElse!=null)
+            {
+                if (ejelse)
+                {
+                    instElse.ejecutar(ts);
+                }
+            }
             return null;
         }
     }

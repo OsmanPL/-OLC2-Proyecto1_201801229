@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using _OLC2_Proyecto1_201801229.Analizador;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
@@ -32,8 +33,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 if (!existe)
                 {
                     Object val = valor.ejecutar(ts);
-
-                    ts.AddLast(new Simbolo(id.ToString(),val));
+                    ts.AddLast(new Simbolo(id.ToString(),val,ts.Entorno));
                 }
                 else
                 {
@@ -55,19 +55,19 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                 switch (tipo)
                                 {
                                     case Simbolo.TipoDato.BOOLEAN:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Boolean.Parse(val.ToString())));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Boolean.Parse(val.ToString()), ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.OBJECT:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val, ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.INTEGER:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, int.Parse(val.ToString())));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.REAL:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Double.Parse(val.ToString())));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.STRING:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val.ToString()));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val.ToString(), ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.IDENTIFICADOR:
                                         //ts.AddLast(new Simbolo(id.ToString(), tipo, ((Int64)val)));
@@ -97,19 +97,19 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                             switch (tipo)
                             {
                                 case Simbolo.TipoDato.BOOLEAN:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, ((Boolean)val)));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, ((Boolean)val), ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.OBJECT:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.INTEGER:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, (Int64.Parse(val.ToString()))));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.REAL:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, (Double.Parse(val.ToString()))));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.STRING:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString()));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString(), ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.IDENTIFICADOR:
                                     //ts.AddLast(new Simbolo(id.ToString(), tipo, ((Int64)val)));

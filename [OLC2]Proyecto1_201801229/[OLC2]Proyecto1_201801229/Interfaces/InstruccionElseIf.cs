@@ -15,9 +15,27 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.condicion = condicion;
             this.sentencias = sentencias;
         }
+
+        public Boolean cond(TablaSimbolos ts)
+        {
+            return (Boolean)condicion.ejecutar(ts);
+        }
         public Object ejecutar(TablaSimbolos ts)
         {
-            return null;
+            if (condicion.ejecutar(ts) != null)
+            {
+                if ((Boolean)condicion.ejecutar(ts))
+                {
+                    if (sentencias != null)
+                    {
+                        foreach (Instruccion inst in sentencias)
+                        {
+                            inst.ejecutar(ts);
+                        }
+                    }
+                }
+            }
+           return null;
         }
     }
 }

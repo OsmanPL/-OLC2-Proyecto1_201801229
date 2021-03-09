@@ -22,6 +22,30 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
+            switch (tipo)
+            {
+                case TipoImprimir.WRITE:
+                    foreach (Operacion dato in datos)
+                    {
+                        Object valor = dato.ejecutar(ts);
+                        if (valor != null)
+                        {
+                            Form1.Consola.Text += valor.ToString();
+                        }
+                    }
+                    break;
+                case TipoImprimir.WRITELN:
+                    foreach (Operacion dato in datos)
+                    {
+                        Object valor = dato.ejecutar(ts);
+                        if (valor != null)
+                        {
+                            Form1.Consola.Text += valor.ToString();
+                        }
+                    }
+                    Form1.Consola.Text += "\n";
+                    break;
+            }
             return null;
         }
     }

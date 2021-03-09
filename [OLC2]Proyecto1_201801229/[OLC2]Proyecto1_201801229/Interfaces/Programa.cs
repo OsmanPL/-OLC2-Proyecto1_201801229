@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
     class Programa : Instruccion
     {
+        public static RichTextBox consola = new RichTextBox();
+
         LinkedList<Instruccion> sentencias;
         LinkedList<Instruccion> instrucciones;
         public Programa(LinkedList<Instruccion> sentencias , LinkedList<Instruccion> instrucciones)
@@ -17,13 +20,23 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
 
         public Object ejecutar(TablaSimbolos ts)
         {
-            foreach (Instruccion inst in sentencias)
+            if (sentencias != null)
             {
-                inst.ejecutar(ts);
+                foreach (Instruccion inst in sentencias)
+                {
+                    inst.ejecutar(ts);
+                }
             }
-            foreach (Instruccion inst in instrucciones)
+            if(instrucciones != null)
             {
-                inst.ejecutar(ts);
+                foreach (Instruccion inst in instrucciones)
+                {
+                    if (inst != null)
+                    {
+
+                        inst.ejecutar(ts);
+                    }
+                }
             }
             return null;
         }
