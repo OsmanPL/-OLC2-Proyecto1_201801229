@@ -377,7 +377,22 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     {
                         Object arr = ts.getValor(id);
                         ArrayPascal arreglo = (ArrayPascal)arr;
-                        return arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString()));
+                        switch (arreglo.Tipo)
+                        {
+                            case Simbolo.TipoDato.INTEGER:
+                                return Double.Parse(arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString())).ToString());
+                            case Simbolo.TipoDato.OBJECT:
+                                return arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString())).ToString();
+                            case Simbolo.TipoDato.STRING:
+                                return arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString())).ToString();
+                            case Simbolo.TipoDato.REAL:
+                                return Double.Parse(arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString())).ToString());
+                            case Simbolo.TipoDato.BOOLEAN:
+                                return Boolean.Parse(arreglo.buscarValor(int.Parse(operadorDer.ejecutar(ts).ToString())).ToString());
+                            default:
+                                return null;
+                        }
+                       
                     }
                     catch (Exception er)
                     {
