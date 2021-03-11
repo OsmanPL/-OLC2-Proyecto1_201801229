@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _OLC2_Proyecto1_201801229.Analizador;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,40 +24,52 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             
             if (condicion.ejecutar(ts) != null)
             {
-                if ((Boolean)condicion.ejecutar(ts))
+                try
                 {
-                    if (sentencias!=null)
+                    if ((Boolean)condicion.ejecutar(ts))
                     {
-                        foreach (Instruccion inst in sentencias)
+                        if (sentencias != null)
                         {
-                            inst.ejecutar(ts);
-                        }
-                    }
-                }
-                else
-                {
-                    bool es = true;
-                    if (listaElseIf!=null)
-                    {
-                        foreach (InstruccionElseIf ei in listaElseIf)
-                        {
-                            Boolean validar = ei.cond(ts);
-                            if (validar)
+                            foreach (Instruccion inst in sentencias)
                             {
-                                es = false;
-                                ei.ejecutar(ts);
-                                break;
+                                inst.ejecutar(ts);
                             }
                         }
                     }
-                    if (instElse != null)
+                    else
                     {
-                        if (es)
+                        bool es = true;
+                        if (listaElseIf != null)
                         {
-                            instElse.ejecutar(ts);
+                            foreach (InstruccionElseIf ei in listaElseIf)
+                            {
+                                Boolean validar = ei.cond(ts);
+                                if (validar)
+                                {
+                                    es = false;
+                                    ei.ejecutar(ts);
+                                    break;
+                                }
+                            }
+                        }
+                        if (instElse != null)
+                        {
+                            if (es)
+                            {
+                                instElse.ejecutar(ts);
+                            }
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                    GeneradorAST.listaErrores.AddLast(new Error("Condicion no retorna un valor boolean", Error.TipoError.SEMANTICO, 0, 0));
+                }
+               
+            }
+            else
+            {
+                GeneradorAST.listaErrores.AddLast(new Error("Condicion no retorna un valor", Error.TipoError.SEMANTICO, 0, 0));
             }
             return null;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _OLC2_Proyecto1_201801229.Analizador;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,10 +22,18 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 foreach (Operacion op in condicion)
                 {
                     Object va = op.ejecutar(ts);
-                    if (val.Equals(va))
+                    if (va!=null)
                     {
-                        return true;
+                        if (val.Equals(va))
+                        {
+                            return true;
+                        }
                     }
+                    else
+                    {
+                        GeneradorAST.listaErrores.AddLast(new Error("Valor del case retorna null", Error.TipoError.SEMANTICO, 0, 0));
+                    }
+                   
                 }
             }
             return false;

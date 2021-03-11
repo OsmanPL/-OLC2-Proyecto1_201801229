@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _OLC2_Proyecto1_201801229.Analizador;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,28 +20,36 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         public Object ejecutar(TablaSimbolos ts)
         {
             Object valor = condicion.ejecutar(ts);
-            bool ejelse = true;
-            if (listaCase!=null)
+            if (valor != null)
             {
-                foreach (InstruccionCase cas in listaCase)
+                bool ejelse = true;
+                if (listaCase != null)
                 {
-
-                    bool iguales = cas.Iguales(valor, ts);
-                    if (iguales)
+                    foreach (InstruccionCase cas in listaCase)
                     {
-                        ejelse = false;
-                        cas.ejecutar(ts);
-                        break;
+
+                        bool iguales = cas.Iguales(valor, ts);
+                        if (iguales)
+                        {
+                            ejelse = false;
+                            cas.ejecutar(ts);
+                            break;
+                        }
+                    }
+                }
+                if (instElse != null)
+                {
+                    if (ejelse)
+                    {
+                        instElse.ejecutar(ts);
                     }
                 }
             }
-            if (instElse!=null)
+            else
             {
-                if (ejelse)
-                {
-                    instElse.ejecutar(ts);
-                }
+                GeneradorAST.listaErrores.AddLast(new Error("Valor del switch retorna null", Error.TipoError.SEMANTICO, 0, 0));
             }
+            
             return null;
         }
     }

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using _OLC2_Proyecto1_201801229.Analizador;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
-    class Asignacion:Instruccion
+    class Asignacion : Instruccion
     {
         String id;
         Operacion valor;
@@ -37,50 +38,104 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         {
             if (posicion != null)
             {
-                
+                int posi = int.Parse(posicion.ejecutar(ts).ToString());
+                Simbolo sim = ts.getSimbolo(id);
+                ArrayPascal arr = (ArrayPascal)sim.Valor;
+                int pos = posi - int.Parse(arr.LimInferior.ejecutar(ts).ToString());
+                Object val = valor.ejecutar(ts);
+                switch (arr.Tipo)
+                {
+                    case Simbolo.TipoDato.BOOLEAN:
+                        arr.Arreglo[pos] = Boolean.Parse(val.ToString());
+                        ts.setValor(id, arr);
+                        break;
+                    case Simbolo.TipoDato.OBJECT:
+                        arr.Arreglo[pos] = val;
+                        ts.setValor(id, arr);
+                        break;
+                    case Simbolo.TipoDato.INTEGER:
+                        arr.Arreglo[pos] = int.Parse(val.ToString());
+                        ts.setValor(id, arr);
+                        break;
+                    case Simbolo.TipoDato.REAL:
+                        arr.Arreglo[pos] = Double.Parse(val.ToString());
+                        ts.setValor(id, arr);
+                        break;
+                    case Simbolo.TipoDato.STRING:
+                        if (valor.Tipo == Operacion.Tipo_operacion.CADENA || valor.Tipo == Operacion.Tipo_operacion.CONCAT)
+                        {
+                            arr.Arreglo[pos] = val.ToString();
+                            ts.setValor(id, arr);
+                        }
+                        else
+                        {
+                            GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " + sim.Tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
+                        }
+                        break;
+                    case Simbolo.TipoDato.IDENTIFICADOR:
+                        arr.Arreglo[pos] = val;
+                        ts.setValor(id, arr);
+                        break;
+                }
             }
-            else if(!id_campo.Equals(""))
+            else if (!id_campo.Equals(""))
             {
-                
+
             }
             else
             {
                 Object val = valor.ejecutar(ts);
                 Simbolo sim = ts.getSimbolo(id);
-                if (sim!=null)
+                if (sim != null)
                 {
-                    try
+                    if (sim.TipoVar == Simbolo.TipoVarariable.VAR)
                     {
-                        switch (sim.Tipo)
+                        try
                         {
-                            case Simbolo.TipoDato.BOOLEAN:
-                                ts.setValor(id,Boolean.Parse(val.ToString()));
-                                break;
-                            case Simbolo.TipoDato.OBJECT:
-                                ts.setValor(id,val);
-                                break;
-                            case Simbolo.TipoDato.INTEGER:
-                                ts.setValor(id, Int64.Parse(val.ToString()));
-                                break;
-                            case Simbolo.TipoDato.REAL:
-                                ts.setValor(id, Double.Parse(val.ToString()));
-                                break;
-                            case Simbolo.TipoDato.STRING:
-                                ts.setValor(id, val.ToString());
-                                break;
-                            case Simbolo.TipoDato.IDENTIFICADOR:
-                                //ts.AddLast(new Simbolo(id.ToString(), tipo, ((Int64)val)));
-                                break;
+                            switch (sim.Tipo)
+                            {
+                                case Simbolo.TipoDato.BOOLEAN:
+                                    ts.setValor(id, Boolean.Parse(val.ToString()));
+                                    break;
+                                case Simbolo.TipoDato.OBJECT:
+                                    ts.setValor(id, val);
+                                    break;
+                                case Simbolo.TipoDato.INTEGER:
+                                    ts.setValor(id, Int64.Parse(val.ToString()));
+                                    break;
+                                case Simbolo.TipoDato.REAL:
+                                    ts.setValor(id, Double.Parse(val.ToString()));
+                                    break;
+                                case Simbolo.TipoDato.STRING:
+                                    if (valor.Tipo == Operacion.Tipo_operacion.CADENA || valor.Tipo == Operacion.Tipo_operacion.CONCAT)
+                                    {
+                                        ts.setValor(id, val.ToString());
+                                    }
+                                    else
+                                    {
+                                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " + sim.Tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
+                                    }
+                                    break;
+                                case Simbolo.TipoDato.IDENTIFICADOR:
+                                    ts.setValor(id, val);
+                                    break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " +sim.Tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        MessageBox.Show("Tipo incorrecto", "Error Semantico");
+                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " es una constante", Error.TipoError.SEMANTICO, 0, 0)); 
                     }
+
                 }
                 else
                 {
-                    MessageBox.Show("Simbolo no encontrado", "Error Semantico");
+                    GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " no existe", Error.TipoError.SEMANTICO, 0, 0));
+
                 }
             }
             return null;

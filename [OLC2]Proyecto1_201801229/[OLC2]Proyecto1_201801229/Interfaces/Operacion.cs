@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using _OLC2_Proyecto1_201801229.Analizador;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
@@ -323,22 +324,48 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 case Tipo_operacion.IDENTIFICADOR:
                     try
                     {
-                        Simbolo sim = ts.getSimbolo(valor.ToString());
-                        switch (sim.Tipo)
+                        bool arrtype = true;
+                        foreach (ArrayPascal ar in GeneradorAST.arrays)
                         {
-                            case Simbolo.TipoDato.INTEGER:
-                                return Double.Parse(ts.getValor(valor.ToString()).ToString());
-                            case Simbolo.TipoDato.OBJECT:
-                                return ts.getValor(valor.ToString());
-                            case Simbolo.TipoDato.STRING:
-                                return ts.getValor(valor.ToString()).ToString();
-                            case Simbolo.TipoDato.REAL:
-                                return Double.Parse(ts.getValor(valor.ToString()).ToString());
-                            case Simbolo.TipoDato.BOOLEAN:
-                                return Boolean.Parse(ts.getValor(valor.ToString()).ToString());
-                            default:
-                                return null;
+                            if (ar.Id.ToLower().Equals(valor.ToString().ToLower()))
+                            {
+                                arrtype = false;
+                                return new ArrayPascal(ar.Id,ar.LimInferior,ar.LimSuperior,ar.Limi,ar.Lims,ar.Tipo, ar.Type1,ar.Arreglo);
+                            }
                         }
+                        if (arrtype)
+                        {
+                            Simbolo sim = ts.getSimbolo(valor.ToString());
+                            if (sim!=null)
+                            {
+                                switch (sim.Tipo)
+                                {
+                                    case Simbolo.TipoDato.INTEGER:
+                                        return Double.Parse(ts.getValor(valor.ToString()).ToString());
+                                    case Simbolo.TipoDato.OBJECT:
+                                        return ts.getValor(valor.ToString());
+                                    case Simbolo.TipoDato.STRING:
+                                        return ts.getValor(valor.ToString()).ToString();
+                                    case Simbolo.TipoDato.REAL:
+                                        return Double.Parse(ts.getValor(valor.ToString()).ToString());
+                                    case Simbolo.TipoDato.BOOLEAN:
+                                        return Boolean.Parse(ts.getValor(valor.ToString()).ToString());
+                                    default:
+                                        return null;
+                                }
+                            }
+                            else
+                            {
+                                GeneradorAST.listaErrores.AddLast(new Error("Error simbolo no existe", Error.TipoError.SEMANTICO,0,0));
+                            }
+                            return null;
+                            
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                       
                     }
                     catch (Exception er)
                     {

@@ -37,7 +37,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 }
                 else
                 {
-                    MessageBox.Show("La variable ya existe", "Error Semantico");
+                    GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " ya fue declarada anteriormente", Error.TipoError.SEMANTICO, 0, 0));
                 }
             }
             else
@@ -70,19 +70,19 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                         ts.AddLast(new Simbolo(ide.ToString(), tipo, val.ToString(), ts.Entorno));
                                         break;
                                     case Simbolo.TipoDato.IDENTIFICADOR:
-                                        //ts.AddLast(new Simbolo(id.ToString(), tipo, ((Int64)val)));
+                                        ts.AddLast(new Simbolo(ide.ToString(),tipo,val,type,ts.Entorno));
                                         break;
                                 }
                             }
                             catch (Exception e)
                             {
-                                MessageBox.Show("Tipo incorrecto", "Error Semantico");
+                                GeneradorAST.listaErrores.AddLast(new Error(ide.ToString() + " esperaba un valor de tipo "+tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
                             }
 
                         }
                         else
                         {
-                            MessageBox.Show("La variable ya existe", "Error Semantico");
+                            GeneradorAST.listaErrores.AddLast(new Error(ide.ToString() +" ya fue declarada anteriormente",Error.TipoError.SEMANTICO,0,0)) ;
                         }
                     }
                 }
@@ -109,22 +109,29 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                     ts.AddLast(new Simbolo(id.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno));
                                     break;
                                 case Simbolo.TipoDato.STRING:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString(), ts.Entorno));
+                                    if (valor.Tipo == Operacion.Tipo_operacion.CONCAT || valor.Tipo == Operacion.Tipo_operacion.CADENA)
+                                    {
+                                        ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString(), ts.Entorno));
+                                    }
+                                    else
+                                    {
+                                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " + tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
+                                    }
                                     break;
                                 case Simbolo.TipoDato.IDENTIFICADOR:
-                                    //ts.AddLast(new Simbolo(id.ToString(), tipo, ((Int64)val)));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, type, ts.Entorno));
                                     break;
                             }
                         }
                         catch (Exception e)
                         {
-                            MessageBox.Show("Tipo incorrecto","Error Semantico");
+                            GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " + tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
                         }
                         
                     }
                     else
                     {
-                        MessageBox.Show("La variable ya existe", "Error Semantico");
+                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + "  ya fue declarada anteriormente", Error.TipoError.SEMANTICO, 0, 0));
                     }
                 }
             }

@@ -18,6 +18,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
         public static LinkedList<Funcion> funciones = new LinkedList<Funcion>();
         public static LinkedList<Procedimiento> procedimientos = new LinkedList<Procedimiento>();
         public static LinkedList<InstruccionType> type = new LinkedList<InstruccionType>();
+        public static LinkedList<ArrayPascal> arrays = new LinkedList<ArrayPascal>();
         public static LinkedList<Error> listaErrores = new LinkedList<Error>();
         public static TablaSimbolos tablaCompleta = new TablaSimbolos("Completa");
         ParseTreeNode raiz = null;
@@ -38,6 +39,8 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             type = new LinkedList<InstruccionType>();
             tablaCompleta = new TablaSimbolos("Completa");
             listaErrores = new LinkedList<Error>();
+            arrays = new LinkedList<ArrayPascal>();
+
             if (raiz != null && arbol.ParserMessages.Count == 0)
             {
                 Programa AST = metodoProgram(raiz.ChildNodes.ElementAt(0));
@@ -47,7 +50,14 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 {
                     tablaCompleta.AddLast(sim);
                 }
-                MessageBox.Show("Se ejecuto todo con exito","Correcto");
+                if (listaErrores.Count > 0)
+                {
+                    MessageBox.Show("Existen errores", "Error");
+                }
+                else
+                {
+                    MessageBox.Show("Se ejecuto todo con exito", "Correcto");
+                }
             }
             else
             {
@@ -99,7 +109,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return metodoDeclaracion(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_asignacion":
                     return metodoAsignacion(nodoActual.ChildNodes.ElementAt(0));
-                case "NT_type":
+                case "NT_tipo":
                     return metodoTypeArray(nodoActual.ChildNodes.ElementAt(0));
                 case "NT_if":
                     return metodoIf(nodoActual.ChildNodes.ElementAt(0));
@@ -116,10 +126,10 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 case "continue":
                     return new InstruccionContinue();
                 case "NT_funcion":
-                    metodoFuncion(nodoActual.ChildNodes.ElementAt(0));
+                    funciones.AddLast( metodoFuncion(nodoActual.ChildNodes.ElementAt(0)));
                     return null;
                 case "NT_procedimiento":
-                     metodoProcedmiento(nodoActual.ChildNodes.ElementAt(0));
+                     procedimientos.AddLast( metodoProcedmiento(nodoActual.ChildNodes.ElementAt(0)));
                     return null;
                 case "NT_write":
                     return metodoImprimir(nodoActual.ChildNodes.ElementAt(0),InstruccionImprimir.TipoImprimir.WRITE);
@@ -144,6 +154,11 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 return null;
             }
         }
+        private String NT_tipo_VAR_s(ParseTreeNode nodoActual)
+        {
+            return NT_tipo(nodoActual.ChildNodes.ElementAt(0));
+        }
+
 
         private Declaracion metodoDeclaracion(ParseTreeNode nodoActual)
         {
@@ -153,7 +168,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 if (tipovar.Equals("var"))
                 {
                     Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
-                    Object valorDafult = valorDefecto(tipo);
+                    Object valorDafult = valorDefecto(tipo, NT_tipo_VAR_s(nodoActual.ChildNodes.ElementAt(3)));
                     Operacion.Tipo_operacion tip = tipOp(tipo);
                     return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), true);
                 }
@@ -168,7 +183,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 if (tipovar.Equals("NT_listaVariables"))
                 {
                     Simbolo.TipoDato tipo = NT_tipo_VAR(nodoActual.ChildNodes.ElementAt(3));
-                    Object valorDafult = valorDefecto(tipo);
+                    Object valorDafult = valorDefecto(tipo, NT_tipo_VAR_s(nodoActual.ChildNodes.ElementAt(3)));
                     Operacion.Tipo_operacion tip = tipOp(tipo);
                     return new Declaracion(listaVariables(nodoActual.ChildNodes.ElementAt(1)), tipo, new Operacion(valorDafult, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), true);
                 }
@@ -196,7 +211,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 }
                 else
                 {
-                    Object val = valorDefecto(tipo);
+                    Object val = valorDefecto(tipo, NT_tipo_VAR_s(nodoActual.ChildNodes.ElementAt(3)));
                     Operacion.Tipo_operacion tip = tipOp(tipo);
                     return new Declaracion(nodoActual.ChildNodes.ElementAt(1).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), false);
                 }
@@ -211,7 +226,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 }
                 else
                 {
-                    Object val = valorDefecto(tipo);
+                    Object val = valorDefecto(tipo, NT_tipo_VAR_s(nodoActual.ChildNodes.ElementAt(2)));
                     Operacion.Tipo_operacion tip = tipOp(tipo);
                     return new Declaracion(nodoActual.ChildNodes.ElementAt(0).ToString().Split(' ')[0], tipo, new Operacion(val, tip), Simbolo.TipoVarariable.VAR, NT_tipo(nodoActual.ChildNodes.ElementAt(2)), false);
                 }
@@ -476,7 +491,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     return Simbolo.TipoDato.IDENTIFICADOR;
             }
         }
-        private Object valorDefecto(Simbolo.TipoDato tipo)
+        private Object valorDefecto(Simbolo.TipoDato tipo ,String g)
         {
             switch (tipo)
             {
@@ -491,7 +506,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 case Simbolo.TipoDato.OBJECT:
                     return "";
                 default:
-                    return "";
+                    return g;
             }
         }
         private String NT_valor(ParseTreeNode nodoActual)
@@ -584,13 +599,13 @@ namespace _OLC2_Proyecto1_201801229.Analizador
             {
                 LinkedList<String> vars = listaVariables(nodoActual.ChildNodes.ElementAt(0));
                 Simbolo.TipoDato tipo = buscarTipoDato(NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
-                Object val = valorDefecto(tipo);
+                Object val = valorDefecto(tipo, NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
                 Operacion.Tipo_operacion tip = tipOp(tipo);
                 Hashtable valores = new Hashtable();
                 foreach (String id in vars)
                 {
                     Parametro parametro = new Parametro(tipo, new Operacion(val, tip), NT_tipo(nodoActual.ChildNodes.ElementAt(2)));
-                    valores.Add(id, parametro);
+                    valores.Add(id.ToLower(), parametro);
                 }
                 return valores;
             }
@@ -889,7 +904,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 foreach (String id in vars)
                 {
                     ParametroFP parametro = new ParametroFP(tipo, NT_tipo(nodoActual.ChildNodes.ElementAt(3)), ParametroFP.TipoValor.REFERENCIA);
-                    valores.Add(id, parametro);
+                    valores.Add(id.ToLower(), parametro);
                 }
                 return valores;
             }
@@ -901,7 +916,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                 foreach (String id in vars)
                 {
                     ParametroFP parametro = new ParametroFP(tipo, NT_tipo(nodoActual.ChildNodes.ElementAt(2)), ParametroFP.TipoValor.VALOR);
-                    valores.Add(id, parametro);
+                    valores.Add(id.ToLower(), parametro);
                 }
                 return valores;
             }

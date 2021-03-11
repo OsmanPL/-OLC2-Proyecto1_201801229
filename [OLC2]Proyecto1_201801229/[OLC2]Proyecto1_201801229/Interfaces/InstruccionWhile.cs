@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _OLC2_Proyecto1_201801229.Analizador;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,23 +17,34 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
-            Boolean cond = (Boolean)condicion.ejecutar(ts);
-            while (cond)
+            try
             {
-                foreach (Instruccion inst in sentencias)
+                Boolean cond = (Boolean)condicion.ejecutar(ts);
+                while (cond)
                 {
-                    if (inst.GetType() == typeof(InstruccionBreak))
+                    if (sentencias != null)
                     {
-                        return null;
+                        foreach (Instruccion inst in sentencias)
+                        {
+                            if (inst.GetType() == typeof(InstruccionBreak))
+                            {
+                                return null;
+                            }
+                            else if (inst.GetType() == typeof(InstruccionContinue))
+                            {
+                                continue;
+                            }
+                            inst.ejecutar(ts);
+                        }
+                        cond = (Boolean)condicion.ejecutar(ts);
                     }
-                    else if (inst.GetType() == typeof(InstruccionContinue))
-                    {
-                        continue;
-                    }
-                    inst.ejecutar(ts);
                 }
-                cond = (Boolean)condicion.ejecutar(ts);
             }
+            catch (Exception e)
+            {
+                GeneradorAST.listaErrores.AddLast(new Error("Condicion no retorna un valor boolean", Error.TipoError.SEMANTICO, 0, 0));
+            }
+            
             return null;
         }
     }
