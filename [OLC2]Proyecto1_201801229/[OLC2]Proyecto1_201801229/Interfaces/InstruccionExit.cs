@@ -14,7 +14,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
-            return null;
+            return retornar.ejecutar(ts);
         }
     }
 }

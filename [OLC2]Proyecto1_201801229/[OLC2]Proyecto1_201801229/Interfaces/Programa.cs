@@ -24,7 +24,11 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             {
                 foreach (Instruccion inst in sentencias)
                 {
-                    inst.ejecutar(ts);
+                    if (inst != null)
+                    {
+
+                        inst.ejecutar(ts);
+                    }
                 }
             }
             if(instrucciones != null)

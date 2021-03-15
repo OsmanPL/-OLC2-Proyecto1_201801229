@@ -151,7 +151,7 @@ namespace _OLC2_Proyecto1_201801229.Analizador
                     "<td>" + sim.Id +
                     "</td>" +
 
-                    "<td>" + "Es constante" +
+                    "<td>" + sim.Tipo.ToString() +
                     "</td>" +
 
                     "<td>" + sim.TipoVar.ToString() +

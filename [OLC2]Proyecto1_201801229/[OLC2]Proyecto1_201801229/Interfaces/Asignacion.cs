@@ -34,6 +34,14 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.posicion = posicion;
             this.id_campo = "";
         }
+        public Object eje(TablaSimbolos ts, String fu)
+        {
+            if (id.ToLower().Equals(fu.ToLower()))
+            {
+                return valor.ejecutar(ts);
+            }
+            return null;
+        }
         public Object ejecutar(TablaSimbolos ts)
         {
             if (posicion != null)
@@ -89,10 +97,10 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 }
                 catch (Exception e)
                 {
-                    GeneradorAST.listaErrores.AddLast(new Error("No es de tipo arreglo ",Error.TipoError.SEMANTICO,0,0)) ;
+                    GeneradorAST.listaErrores.AddLast(new Error("No es de tipo arreglo ", Error.TipoError.SEMANTICO, 0, 0));
                 }
-                
-                
+
+
             }
             else if (!id_campo.Equals(""))
             {
@@ -102,7 +110,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             {
                 Object val = valor.ejecutar(ts);
                 Simbolo sim = ts.getSimbolo(id);
-                if (sim != null)
+                if (sim != null && val != null)
                 {
                     if (sim.TipoVar == Simbolo.TipoVarariable.VAR)
                     {
@@ -117,7 +125,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                     ts.setValor(id, val);
                                     break;
                                 case Simbolo.TipoDato.INTEGER:
-                                    ts.setValor(id, Int64.Parse(val.ToString()));
+                                    ts.setValor(id, int.Parse(val.ToString()));
                                     break;
                                 case Simbolo.TipoDato.REAL:
                                     ts.setValor(id, Double.Parse(val.ToString()));
@@ -139,18 +147,26 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                         }
                         catch (Exception e)
                         {
-                            GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " +sim.Tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
+                            GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " esperaba un valor de tipo " + sim.Tipo.ToString(), Error.TipoError.SEMANTICO, 0, 0));
                         }
                     }
                     else
                     {
-                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " es una constante", Error.TipoError.SEMANTICO, 0, 0)); 
+                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " es una constante", Error.TipoError.SEMANTICO, 0, 0));
                     }
 
                 }
                 else
                 {
-                    GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " no existe", Error.TipoError.SEMANTICO, 0, 0));
+                    if (val == null)
+                    {
+                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " valor nulo", Error.TipoError.SEMANTICO, 0, 0));
+                    }
+                    if (sim == null)
+                    {
+                        GeneradorAST.listaErrores.AddLast(new Error(id.ToString() + " no existe", Error.TipoError.SEMANTICO, 0, 0));
+                    }
+
 
                 }
             }

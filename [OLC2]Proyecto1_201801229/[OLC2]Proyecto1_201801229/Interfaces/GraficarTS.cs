@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace _OLC2_Proyecto1_201801229.Interfaces
 {
-    class GraficarTS:Instruccion
+    class GraficarTS : Instruccion
     {
         public GraficarTS()
         {
@@ -13,18 +13,15 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
         public Object ejecutar(TablaSimbolos ts)
         {
+            Form1.Consola.Text += "\n";
+            Form1.Consola.Text += "-----------------------------------------------------------\n";
+            Form1.Consola.Text += "|   Identificador  | Tipo de Dato  | Tipo de Simbolo |   Valor   |    Entorno    |\n";
             foreach (Simbolo sim in ts)
             {
-                switch (sim.TipoVar)
-                {
-                    case Simbolo.TipoVarariable.CONST:
-                        MessageBox.Show("Id: "+sim.Id+", Valor: "+sim.Valor.ToString()+", Entorno: "+ts.Entorno,"Constante");
-                        break;
-                    case Simbolo.TipoVarariable.VAR:
-                        MessageBox.Show("Id: " + sim.Id + ", Valor: " + sim.Valor.ToString()+", Tipo: "+sim.Tipo.ToString() + ", Entorno: " + ts.Entorno, "Variable");
-                        break;
-                }
+                Form1.Consola.Text += "|"+sim.Id+"|"+sim.Tipo.ToString()+"|"+sim.TipoVar.ToString()+"|"+sim.Valor.ToString()+"|"+sim.Entorno+"|\n";
             }
+            Form1.Consola.Text += "-----------------------------------------------------------\n";
+            Form1.Consola.Text += "\n";
             return null;
         }
     }

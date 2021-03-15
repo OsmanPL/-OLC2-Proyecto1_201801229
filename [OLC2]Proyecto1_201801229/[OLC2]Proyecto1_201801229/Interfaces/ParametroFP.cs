@@ -11,6 +11,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             REFERENCIA,
             VALOR
         }
+        String id;
         Simbolo.TipoDato tipo;
         String type;
         TipoValor rv;
@@ -22,9 +23,11 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         internal TipoValor Rv { get => rv; set => rv = value; }
         internal Object Valor { get => valor; set => valor = value; }
         public string Refe { get => refe; set => refe = value; }
+        public string Id { get => id; set => id = value; }
 
-        public ParametroFP(Simbolo.TipoDato tipo, String type, TipoValor rv)
+        public ParametroFP(String id,Simbolo.TipoDato tipo, String type, TipoValor rv)
         {
+            this.Id = id;
             this.tipo = tipo;
             this.type = type;
             this.rv = rv;

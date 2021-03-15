@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Text;
 using System.Windows.Forms;
 using _OLC2_Proyecto1_201801229.Analizador;
@@ -70,7 +74,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.Tipo = tipo;
             this.operadorIzq = operadorIzq;
             this.operadorDer = operadorDer;
-        }         
+        }
         public Operacion(Operacion operadorIzq, Tipo_operacion tipo)
         {
             this.Tipo = tipo;
@@ -81,7 +85,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.id = id;
             this.Tipo = tipo;
         }
-        public Operacion(String id, LinkedList<Operacion> valor,Tipo_operacion tipo)
+        public Operacion(String id, LinkedList<Operacion> valor, Tipo_operacion tipo)
         {
             this.id = id;
             this.valores = valor;
@@ -94,7 +98,8 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         }
 
 
-        public Object ejecutar(TablaSimbolos ts) {
+        public Object ejecutar(TablaSimbolos ts)
+        {
             Object valorIzquierdo;
             Object valorDerecho;
             switch (tipo)
@@ -128,7 +133,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     {
                         if (valorIzquierdo is Boolean)
                         {
-                            return !(Boolean)valorIzquierdo ;
+                            return !(Boolean)valorIzquierdo;
                         }
                     }
                     return null;
@@ -204,7 +209,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     valorDerecho = operadorDer.ejecutar(ts);
                     if (valorIzquierdo != null && valorDerecho != null)
                     {
-                        if(valorIzquierdo is Double && valorDerecho is Double)
+                        if (valorIzquierdo is Double && valorDerecho is Double)
                         {
                             return (Double)valorIzquierdo + (Double)valorDerecho;
                         }
@@ -256,15 +261,15 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     return null;
                 case Tipo_operacion.NEGATIVO:
                     valorIzquierdo = operadorIzq.ejecutar(ts);
-                    if (valorIzquierdo != null )
+                    if (valorIzquierdo != null)
                     {
-                        if (valorIzquierdo is Double )
+                        if (valorIzquierdo is Double)
                         {
                             return (Double)valorIzquierdo * -1;
                         }
                     }
                     return null;
-                    
+
 
                 //Operacion Concatenar
                 case Tipo_operacion.CONCAT:
@@ -278,7 +283,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     }
                     catch (Exception er)
                     {
-                        MessageBox.Show("No es tipo integer","Error");
+                        MessageBox.Show("No es tipo integer", "Error");
                         return null;
                     }
                 case Tipo_operacion.DECIMAL:
@@ -330,13 +335,13 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                             if (ar.Id.ToLower().Equals(valor.ToString().ToLower()))
                             {
                                 arrtype = false;
-                                return new ArrayPascal(ar.Id,ar.LimInferior,ar.LimSuperior,ar.Limi,ar.Lims,ar.Tipo, ar.Type1,ar.Arreglo);
+                                return new ArrayPascal(ar.Id, ar.LimInferior, ar.LimSuperior, ar.Limi, ar.Lims, ar.Tipo, ar.Type1, ar.Arreglo);
                             }
                         }
                         if (arrtype)
                         {
                             Simbolo sim = ts.getSimbolo(valor.ToString());
-                            if (sim!=null)
+                            if (sim != null)
                             {
                                 switch (sim.Tipo)
                                 {
@@ -356,16 +361,16 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                             }
                             else
                             {
-                                GeneradorAST.listaErrores.AddLast(new Error("Error simbolo no existe", Error.TipoError.SEMANTICO,0,0));
+                                GeneradorAST.listaErrores.AddLast(new Error("Error simbolo no existe", Error.TipoError.SEMANTICO, 0, 0));
                             }
                             return null;
-                            
+
                         }
                         else
                         {
                             return null;
                         }
-                       
+
                     }
                     catch (Exception er)
                     {
@@ -392,7 +397,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                             default:
                                 return null;
                         }
-                       
+
                     }
                     catch (Exception er)
                     {
@@ -404,14 +409,307 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                     {
                         Object arr = ts.getValor(id);
                         InstruccionType arreglo = (InstruccionType)arr;
-                        return arreglo.buscarValor(type,ts);
+                        return arreglo.buscarValor(type, ts);
                     }
                     catch (Exception er)
                     {
-                        MessageBox.Show("No es tipo real", "Error");
+                        MessageBox.Show("No es tipo type", "Error");
                         return null;
                     }
 
+                //Funcion
+                case Tipo_operacion.LLAMADAFUNCION:
+                    try
+                    {
+                        bool fp = true;
+                        bool err = false;
+                        Funcion func = new Funcion();
+                        int i = 0;
+                        if (GeneradorAST.funciones != null)
+                        {
+                            foreach (Funcion f in GeneradorAST.funciones)
+                            {
+                                if (f.Id.ToLower().Equals(id.ToLower()))
+                                {
+                                    func = new Funcion(f.Id, f.Retorno, f.ValorRetorno, f.Parametros, f.Instrucciones, f.Sentencias, f.Type);
+                                    fp = false;
+                                    if (valores.Count == f.Parametros.Count)
+                                    {
+                                        foreach (ParametroFP par in f.Parametros)
+                                        {
+                                            if (par.Rv == ParametroFP.TipoValor.REFERENCIA)
+                                            {
+                                                if (valores.ElementAt(i).Tipo == Tipo_operacion.IDENTIFICADOR)
+                                                {
+                                                    Object val = valores.ElementAt(i).ejecutar(ts);
+                                                    switch (par.Tipo)
+                                                    {
+                                                        case Simbolo.TipoDato.INTEGER:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            par.Refe = valores.ElementAt(i).valor.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.OBJECT:
+                                                            par.Valor = val;
+                                                            par.Refe = valores.ElementAt(i).valor.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.STRING:
+                                                            par.Valor = val.ToString();
+                                                            par.Refe = valores.ElementAt(i).valor.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.REAL:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            par.Refe = valores.ElementAt(i).valor.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.BOOLEAN:
+                                                            par.Valor = Boolean.Parse(val.ToString());
+                                                            par.Refe = valores.ElementAt(i).valor.ToString();
+                                                            break;
+                                                        default:
+                                                            par.Valor = null;
+                                                            break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Object val = valores.ElementAt(i).ejecutar(ts);
+                                                    switch (par.Tipo)
+                                                    {
+                                                        case Simbolo.TipoDato.INTEGER:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            break;
+                                                        case Simbolo.TipoDato.OBJECT:
+                                                            par.Valor = val;
+                                                            break;
+                                                        case Simbolo.TipoDato.STRING:
+                                                            par.Valor = val.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.REAL:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            break;
+                                                        case Simbolo.TipoDato.BOOLEAN:
+                                                            par.Valor = Boolean.Parse(val.ToString());
+                                                            break;
+                                                        default:
+                                                            par.Valor = null;
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Object val = valores.ElementAt(i).ejecutar(ts);
+                                                switch (par.Tipo)
+                                                {
+                                                    case Simbolo.TipoDato.INTEGER:
+                                                        par.Valor = Double.Parse(val.ToString());
+                                                        break;
+                                                    case Simbolo.TipoDato.OBJECT:
+                                                        par.Valor = val;
+                                                        break;
+                                                    case Simbolo.TipoDato.STRING:
+                                                        par.Valor = val.ToString();
+                                                        break;
+                                                    case Simbolo.TipoDato.REAL:
+                                                        par.Valor = Double.Parse(val.ToString());
+                                                        break;
+                                                    case Simbolo.TipoDato.BOOLEAN:
+                                                        par.Valor = Boolean.Parse(val.ToString());
+                                                        break;
+                                                    default:
+                                                        par.Valor = null;
+                                                        break;
+                                                }
+                                            }
+                                            i++;
+                                        }
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        err = true;
+                                    }
+
+                                }
+                            }
+                        }
+                        if (fp)
+                        {
+                            Procedimiento pro = new Procedimiento();
+                            if (GeneradorAST.procedimientos != null)
+                            {
+                                foreach (Procedimiento f in GeneradorAST.procedimientos)
+                                {
+                                    if (f.Id.ToLower().Equals(id.ToLower()))
+                                    {
+                                        pro = new Procedimiento(f.Id, f.Parametros, f.Instrucciones, f.Sentencias);
+                                        fp = false;
+                                        if (valores.Count == f.Parametros.Count)
+                                        {
+                                            foreach (ParametroFP par in f.Parametros)
+                                            {
+                                                if (par.Rv == ParametroFP.TipoValor.REFERENCIA)
+                                                {
+                                                    if (valores.ElementAt(i).Tipo == Tipo_operacion.IDENTIFICADOR)
+                                                    {
+                                                        Object val = valores.ElementAt(i).ejecutar(ts);
+                                                        switch (par.Tipo)
+                                                        {
+                                                            case Simbolo.TipoDato.INTEGER:
+                                                                par.Valor = Double.Parse(val.ToString());
+                                                                par.Refe = valores.ElementAt(i).valor.ToString();
+                                                                break;
+                                                            case Simbolo.TipoDato.OBJECT:
+                                                                par.Valor = val;
+                                                                par.Refe = valores.ElementAt(i).valor.ToString();
+                                                                break;
+                                                            case Simbolo.TipoDato.STRING:
+                                                                par.Valor = val.ToString();
+                                                                par.Refe = valores.ElementAt(i).valor.ToString();
+                                                                break;
+                                                            case Simbolo.TipoDato.REAL:
+                                                                par.Valor = Double.Parse(val.ToString());
+                                                                par.Refe = valores.ElementAt(i).valor.ToString();
+                                                                break;
+                                                            case Simbolo.TipoDato.BOOLEAN:
+                                                                par.Valor = Boolean.Parse(val.ToString());
+                                                                par.Refe = valores.ElementAt(i).valor.ToString();
+                                                                break;
+                                                            default:
+                                                                par.Valor = null;
+                                                                break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Object val = valores.ElementAt(i).ejecutar(ts);
+                                                        switch (par.Tipo)
+                                                        {
+                                                            case Simbolo.TipoDato.INTEGER:
+                                                                par.Valor = Double.Parse(val.ToString());
+                                                                break;
+                                                            case Simbolo.TipoDato.OBJECT:
+                                                                par.Valor = val;
+                                                                break;
+                                                            case Simbolo.TipoDato.STRING:
+                                                                par.Valor = val.ToString();
+                                                                break;
+                                                            case Simbolo.TipoDato.REAL:
+                                                                par.Valor = Double.Parse(val.ToString());
+                                                                break;
+                                                            case Simbolo.TipoDato.BOOLEAN:
+                                                                par.Valor = Boolean.Parse(val.ToString());
+                                                                break;
+                                                            default:
+                                                                par.Valor = null;
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Object val = valores.ElementAt(i).ejecutar(ts);
+                                                    switch (par.Tipo)
+                                                    {
+                                                        case Simbolo.TipoDato.INTEGER:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            break;
+                                                        case Simbolo.TipoDato.OBJECT:
+                                                            par.Valor = val;
+                                                            break;
+                                                        case Simbolo.TipoDato.STRING:
+                                                            par.Valor = val.ToString();
+                                                            break;
+                                                        case Simbolo.TipoDato.REAL:
+                                                            par.Valor = Double.Parse(val.ToString());
+                                                            break;
+                                                        case Simbolo.TipoDato.BOOLEAN:
+                                                            par.Valor = Boolean.Parse(val.ToString());
+                                                            break;
+                                                        default:
+                                                            par.Valor = null;
+                                                            break;
+                                                    }
+                                                }
+                                                i++;
+                                            }
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            err = true;
+                                        }
+
+                                    }
+                                }
+                            }
+                            if (!fp)
+                            {
+                                pro.ejecutar(ts);
+                            }
+                            else
+                            {
+                                GeneradorAST.listaErrores.AddLast(new Error("No existe ninguna funcion o procedimiento con el nombre " + id, Error.TipoError.SEMANTICO, 0, 0));
+                            }
+                            return null;
+                        }
+                        else
+                        {
+                            return func.ejecutar(ts);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+
+                case Tipo_operacion.LLAMADAPROCEDIMIENTO:
+                    try
+                    {
+                        bool fp = true;
+                        bool err = false;
+                        Funcion func = new Funcion();
+                        foreach (Funcion f in GeneradorAST.funciones)
+                        {
+                            if (f.Id.ToLower().Equals(id.ToLower()))
+                            {
+                                func = new Funcion(f.Id, f.Retorno, f.ValorRetorno, f.Parametros, f.Instrucciones, f.Sentencias, f.Type);
+                                fp = false;
+                            }
+                        }
+                        if (fp)
+                        {
+                            Procedimiento pro = new Procedimiento();
+                            if (GeneradorAST.procedimientos != null)
+                            {
+                                foreach (Procedimiento f in GeneradorAST.procedimientos)
+                                {
+                                    if (f.Id.ToLower().Equals(id.ToLower()))
+                                    {
+                                        pro = new Procedimiento(f.Id, f.Parametros, f.Instrucciones, f.Sentencias);
+                                        fp = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!fp)
+                            {
+                                pro.ejecutar(ts);
+                            }
+                            else
+                            {
+                                GeneradorAST.listaErrores.AddLast(new Error("No existe ninguna funcion o procedimiento con el nombre " + id, Error.TipoError.SEMANTICO, 0, 0));
+                            }
+                            return null;
+                        }
+                        else
+                        {
+                            return func.ejecutar(ts);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
             }
             return null;
         }

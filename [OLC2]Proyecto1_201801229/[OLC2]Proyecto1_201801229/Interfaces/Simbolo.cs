@@ -13,12 +13,12 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
         private String type;
         private String entorno;
 
-        public Simbolo(String id, TipoDato tipo, Object valor, String entorno)
+        public Simbolo(String id, TipoDato tipo, Object valor, String entorno, TipoVarariable tipoVar)
         {
             this.Tipo = tipo;
             this.Id = id;
             this.Valor = valor;
-            this.TipoVar = TipoVarariable.VAR;
+            this.TipoVar = tipoVar;
             this.Entorno = entorno;
         }
 
@@ -30,12 +30,12 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             this.Entorno = entorno;
         }
 
-        public Simbolo(String id, TipoDato tipo, Object valor, String type, String entorno)
+        public Simbolo(String id, TipoDato tipo, Object valor, String type, String entorno, TipoVarariable tipoVar)
         {
             this.Tipo = tipo;
             this.Id = id;
             this.Valor = valor;
-            this.TipoVar = TipoVarariable.VAR;
+            this.TipoVar = tipoVar;
             this.Type = type;
             this.Entorno = entorno;
         }

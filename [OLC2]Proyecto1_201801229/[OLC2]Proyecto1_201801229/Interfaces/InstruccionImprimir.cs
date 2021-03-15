@@ -25,22 +25,30 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
             switch (tipo)
             {
                 case TipoImprimir.WRITE:
-                    foreach (Operacion dato in datos)
+                    if (datos != null)
                     {
-                        Object valor = dato.ejecutar(ts);
-                        if (valor != null)
+
+                        foreach (Operacion dato in datos)
                         {
-                            Form1.Consola.Text += valor.ToString();
+                            Object valor = dato.ejecutar(ts);
+                            if (valor != null)
+                            {
+                                Form1.Consola.Text += valor.ToString();
+                            }
                         }
                     }
                     break;
                 case TipoImprimir.WRITELN:
-                    foreach (Operacion dato in datos)
+                    if (datos!=null)
                     {
-                        Object valor = dato.ejecutar(ts);
-                        if (valor != null)
+
+                        foreach (Operacion dato in datos)
                         {
-                            Form1.Consola.Text += valor.ToString();
+                            Object valor = dato.ejecutar(ts);
+                            if (valor != null)
+                            {
+                                Form1.Consola.Text += valor.ToString();
+                            }
                         }
                     }
                     Form1.Consola.Text += "\n";

@@ -33,7 +33,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                 if (!existe)
                 {
                     Object val = valor.ejecutar(ts);
-                    ts.AddLast(new Simbolo(id.ToString(),val,ts.Entorno));
+                    ts.AddLast(new Simbolo(id.ToString(),tipo,val,ts.Entorno,vc));
                 }
                 else
                 {
@@ -55,22 +55,22 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                 switch (tipo)
                                 {
                                     case Simbolo.TipoDato.BOOLEAN:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Boolean.Parse(val.ToString()), ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Boolean.Parse(val.ToString()), ts.Entorno,vc));
                                         break;
                                     case Simbolo.TipoDato.OBJECT:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val, ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val, ts.Entorno, vc));
                                         break;
                                     case Simbolo.TipoDato.INTEGER:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno, vc));
                                         break;
                                     case Simbolo.TipoDato.REAL:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno, vc));
                                         break;
                                     case Simbolo.TipoDato.STRING:
-                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val.ToString(), ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(), tipo, val.ToString(), ts.Entorno, vc));
                                         break;
                                     case Simbolo.TipoDato.IDENTIFICADOR:
-                                        ts.AddLast(new Simbolo(ide.ToString(),tipo,val,type,ts.Entorno));
+                                        ts.AddLast(new Simbolo(ide.ToString(),tipo,val,type,ts.Entorno, vc));
                                         break;
                                 }
                             }
@@ -97,21 +97,21 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                             switch (tipo)
                             {
                                 case Simbolo.TipoDato.BOOLEAN:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, ((Boolean)val), ts.Entorno));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, ((Boolean)val), ts.Entorno, vc));
                                     break;
                                 case Simbolo.TipoDato.OBJECT:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, ts.Entorno));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, ts.Entorno, vc));
                                     break;
                                 case Simbolo.TipoDato.INTEGER:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, int.Parse(val.ToString()), ts.Entorno, vc));
                                     break;
                                 case Simbolo.TipoDato.REAL:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, Double.Parse(val.ToString()), ts.Entorno, vc));
                                     break;
                                 case Simbolo.TipoDato.STRING:
                                     if (valor.Tipo == Operacion.Tipo_operacion.CONCAT || valor.Tipo == Operacion.Tipo_operacion.CADENA)
                                     {
-                                        ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString(), ts.Entorno));
+                                        ts.AddLast(new Simbolo(id.ToString(), tipo, val.ToString(), ts.Entorno, vc));
                                     }
                                     else
                                     {
@@ -119,7 +119,7 @@ namespace _OLC2_Proyecto1_201801229.Interfaces
                                     }
                                     break;
                                 case Simbolo.TipoDato.IDENTIFICADOR:
-                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, type, ts.Entorno));
+                                    ts.AddLast(new Simbolo(id.ToString(), tipo, val, type, ts.Entorno, vc));
                                     break;
                             }
                         }
